@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event.workflow_run.head_branch }}
 
-      - uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v3.0.0
+      - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
         with:
           version: 9
 
