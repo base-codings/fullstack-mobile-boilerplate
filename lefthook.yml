@@ -53,7 +53,7 @@ pre-commit:
 pre-push:
   commands:
     test-api:
-      run: pnpm --filter @mobile-boilerplate/api test --passWithNoTests
+      run: pnpm --filter @mobile-boilerplate/api test -- --passWithNoTests
 
     test-mobile:
       run: |
