@@ -2,8 +2,8 @@
 
 > 🌐 **Language:** **English** · [Tiếng Việt](docs/languages/vi/README.md) · [中文](docs/languages/zh/README.md) · [한국어](docs/languages/ko/README.md)
 
-[![API CI](https://github.com/<owner>/<repo>/actions/workflows/api-ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/api-ci.yml)
-[![Mobile CI](https://github.com/<owner>/<repo>/actions/workflows/mobile-ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/mobile-ci.yml)
+[![API CI](https://github.com/base-codings/fullstack-mobile-boilerplate/actions/workflows/api-ci.yml/badge.svg)](https://github.com/base-codings/fullstack-mobile-boilerplate/actions/workflows/api-ci.yml)
+[![Mobile CI](https://github.com/base-codings/fullstack-mobile-boilerplate/actions/workflows/mobile-ci.yml/badge.svg)](https://github.com/base-codings/fullstack-mobile-boilerplate/actions/workflows/mobile-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Production-ready monorepo boilerplate for mobile apps: **Flutter** frontend + **NestJS** backend with end-to-end type safety via OpenAPI codegen.
@@ -21,23 +21,33 @@ Production-ready monorepo boilerplate for mobile apps: **Flutter** frontend + **
 
 ## Tech Stack
 
-| Layer        | Technology                                     |
-| ------------ | ---------------------------------------------- |
-| Mobile       | Flutter 3.27 + Riverpod 2 + Dio + go_router    |
-| Backend      | NestJS 10 + Prisma 5 + Supabase Postgres + Pino |
-| Monorepo     | pnpm workspace + Melos                         |
-| Toolchain    | FVM + Volta + Node 20                          |
-| Codegen      | OpenAPI Generator (dart-dio)                   |
-| CI/CD        | GitHub Actions + semantic-release              |
+| Layer     | Technology                                      |
+| --------- | ----------------------------------------------- |
+| Mobile    | Flutter 3.27 + Riverpod 2 + Dio + go_router     |
+| Backend   | NestJS 10 + Prisma 5 + Supabase Postgres + Pino |
+| Monorepo  | pnpm workspace + Melos                          |
+| Toolchain | FVM + Volta + Node 20                           |
+| Codegen   | OpenAPI Generator (dart-dio)                    |
+| CI/CD     | GitHub Actions + semantic-release               |
 
 ## Prerequisites
 
+**Minimum (backend-only dev):**
+
 - **Node.js 20+** (managed by `.nvmrc` / Volta)
 - **pnpm 9+** (`corepack enable && corepack prepare pnpm@9 --activate`)
-- **Flutter 3.27** via FVM (`dart pub global activate fvm && fvm install`)
-- **Docker** (optional; for `docker compose up api`)
-- **Java 17** (only required if running `pnpm codegen:api` locally)
-- **Supabase project** (optional for hello flow — set `SKIP_DB=true` to bypass)
+
+**Required for full bootstrap (`pnpm bootstrap:full`) and mobile work:**
+
+- **Flutter 3.27** via FVM — `dart pub global activate fvm && fvm install`
+- **Java 17** — required by `openapi-generator-cli` during `pnpm codegen:api`
+- **Melos** — auto-activated by `pnpm install:melos` (uses `fvm dart pub global activate melos`)
+- **`~/.pub-cache/bin` on PATH** — so the `melos` binary is reachable after activation
+
+**Optional:**
+
+- **Docker** (for `docker compose up api`)
+- **Supabase project** (or set `SKIP_DB=true` to skip the database for the hello flow)
 
 ## Quick Start
 
@@ -54,8 +64,10 @@ cp apps/api/.env.example apps/api/.env
 # 3. Configure mobile env (default API_BASE_URL=auto resolves per platform)
 cp apps/mobile/.env.example apps/mobile/.env
 
-# 4. Install everything (pnpm + codegen + melos)
-pnpm bootstrap
+# 4. Install everything
+#    Backend-only:  pnpm bootstrap         (just pnpm deps — no Flutter/Java needed)
+#    Full stack:    pnpm bootstrap:full    (pnpm + activate melos + codegen + melos bootstrap)
+pnpm bootstrap:full
 
 # 5. Boot the backend
 pnpm --filter @mobile-boilerplate/api dev
@@ -92,29 +104,30 @@ mobile-boilerplate/
 
 ## Common Commands
 
-| Command                                                          | Purpose                              |
-| ---------------------------------------------------------------- | ------------------------------------ |
-| `pnpm bootstrap`                                                 | Install everything (pnpm + codegen + melos) |
-| `pnpm --filter @mobile-boilerplate/api dev`                      | Start backend with hot reload        |
-| `cd apps/mobile && fvm flutter run --dart-define=FLAVOR=dev`     | Start mobile app                     |
-| `pnpm codegen:api`                                               | Regenerate Dart api_client           |
-| `pnpm lint`                                                      | Lint all (backend + mobile)          |
-| `pnpm test`                                                      | Test all                             |
-| `docker compose up api`                                          | Run backend in container             |
+| Command                                                      | Purpose                                     |
+| ------------------------------------------------------------ | ------------------------------------------- |
+| `pnpm bootstrap`                                             | Install npm deps only (backend-only dev)    |
+| `pnpm bootstrap:full`                                        | Full stack: pnpm + melos + codegen + pub get |
+| `pnpm --filter @mobile-boilerplate/api dev`                  | Start backend with hot reload               |
+| `cd apps/mobile && fvm flutter run --dart-define=FLAVOR=dev` | Start mobile app                            |
+| `pnpm codegen:api`                                           | Regenerate Dart api_client                  |
+| `pnpm lint`                                                  | Lint all (backend + mobile)                 |
+| `pnpm test`                                                  | Test all                                    |
+| `docker compose up api`                                      | Run backend in container                    |
 
 ## Documentation
 
-| Doc                                                                                | Purpose                |
-| ---------------------------------------------------------------------------------- | ---------------------- |
-| [Local development](docs/guides/local-development.md)                              | Detailed onboarding    |
-| [Add a backend module](docs/guides/add-new-backend-module.md)                      | Recipe                 |
-| [Add a Prisma model](docs/guides/add-prisma-module.md)                             | Recipe                 |
-| [Add a Flutter feature](docs/guides/add-new-flutter-feature.md)                    | Recipe                 |
-| [API contract workflow](docs/guides/api-contract-workflow.md)                      | Codegen flow           |
-| [System architecture](docs/system-architecture.md)                                 | High-level design      |
-| [Code standards](docs/code-standards.md)                                           | Conventions            |
-| [Feature boundaries](docs/feature-boundaries.md)                                   | Module isolation rules |
-| [Deployment guide](docs/deployment-guide.md)                                       | Release flow           |
+| Doc                                                             | Purpose                |
+| --------------------------------------------------------------- | ---------------------- |
+| [Local development](docs/guides/local-development.md)           | Detailed onboarding    |
+| [Add a backend module](docs/guides/add-new-backend-module.md)   | Recipe                 |
+| [Add a Prisma model](docs/guides/add-prisma-module.md)          | Recipe                 |
+| [Add a Flutter feature](docs/guides/add-new-flutter-feature.md) | Recipe                 |
+| [API contract workflow](docs/guides/api-contract-workflow.md)   | Codegen flow           |
+| [System architecture](docs/system-architecture.md)              | High-level design      |
+| [Code standards](docs/code-standards.md)                        | Conventions            |
+| [Feature boundaries](docs/feature-boundaries.md)                | Module isolation rules |
+| [Deployment guide](docs/deployment-guide.md)                    | Release flow           |
 
 → Full index: [docs/README.md](docs/README.md)
 

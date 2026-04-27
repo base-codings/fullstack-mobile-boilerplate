@@ -15,7 +15,9 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "lefthook install || true",
-    "bootstrap": "pnpm install && pnpm codegen:api && melos bootstrap",
+    "install:melos": "command -v melos >/dev/null || (command -v fvm >/dev/null && fvm dart pub global activate melos) || dart pub global activate melos",
+    "bootstrap": "pnpm install",
+    "bootstrap:full": "pnpm install && pnpm install:melos && pnpm codegen:api && melos bootstrap",
     "lint": "pnpm -r --if-present lint && melos run analyze",
     "test": "pnpm -r --if-present test && melos run test",
     "format": "pnpm -r --if-present format && melos run format",
@@ -29,7 +31,6 @@
     "husky": "^9.1.6",
     "lefthook": "^1.7.18",
     "lint-staged": "^15.2.10",
-    "melos": "^6.2.0",
     "only-allow": "^1.2.1"
   }
 }

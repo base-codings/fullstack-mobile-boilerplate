@@ -79,3 +79,7 @@ docs/api/
 .cache/
 .parcel-cache/
 *.local
+
+plans/
+.claude/
+.agents/

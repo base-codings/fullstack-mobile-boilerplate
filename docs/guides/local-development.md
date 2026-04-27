@@ -24,6 +24,17 @@ dart --version     # 3.5.x
 java -version      # openjdk 17+
 ```
 
+**Add `~/.pub-cache/bin` to PATH** so `melos` (and other Dart pub global tools) resolve after activation:
+
+```bash
+# bash / zsh
+echo 'export PATH="$PATH:$HOME/.pub-cache/bin"' >> ~/.profile
+source ~/.profile
+
+# fish
+fish_add_path ~/.pub-cache/bin
+```
+
 ## Clone & Install
 
 ```bash
@@ -31,17 +42,21 @@ java -version      # openjdk 17+
 git clone https://github.com/yourorg/mobile-boilerplate.git
 cd mobile-boilerplate
 
-# 2. Install dependencies (all workspaces)
-pnpm install
-
-# 3. Bootstrap monorepo (codegen + Melos)
+# 2a. Backend-only dev (no Flutter / Java needed)
 pnpm bootstrap
+
+# 2b. Full stack (mobile + codegen) — requires FVM + Java 17 on PATH
+pnpm bootstrap:full
 ```
 
-**What `pnpm bootstrap` does:**
-- Installs all workspace dependencies
-- Runs `pnpm codegen:api` (generates Dart client)
-- Runs `melos bootstrap` (links pub packages)
+**What each script does:**
+
+| Script                | Steps                                                                            | When to use                  |
+| --------------------- | -------------------------------------------------------------------------------- | ---------------------------- |
+| `pnpm bootstrap`      | `pnpm install`                                                                   | Backend-only contributors    |
+| `pnpm bootstrap:full` | `pnpm install` → `pnpm install:melos` → `pnpm codegen:api` → `melos bootstrap`   | Mobile dev / full validation |
+
+> **Why split?** `melos` is a Dart pub package, not on npm — it's activated lazily via `fvm dart pub global activate melos`. The codegen step needs Java 17 (`openapi-generator-cli`) and Flutter SDK (`build_runner`). Backend-only contributors skip those prereqs.
 
 ## Backend Setup
 
@@ -239,11 +254,11 @@ fvm flutter run --verbose  # See full error
 ## Common Commands
 
 ```bash
-# Install deps (root)
-pnpm install
-
-# Bootstrap + codegen
+# Backend-only install
 pnpm bootstrap
+
+# Full stack (pnpm + activate melos + codegen + melos bootstrap)
+pnpm bootstrap:full
 
 # Lint & test (all)
 pnpm lint
