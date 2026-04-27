@@ -254,7 +254,7 @@ IconButton(
 
 ## Navigation
 
-Uses **go_router** (see [system-architecture.md](system-architecture.md#frontend-architecture)).
+Uses **go_router** (see [architecture.md](architecture.md#frontend-architecture)).
 
 **Define routes in lib/core/router/app_router.dart:**
 ```dart
@@ -313,7 +313,7 @@ AnimatedBuilder(
 2. **Avoid custom ThemeData unless necessary.** Material 3 covers 95% of use cases.
 3. **Test both light and dark themes.** Use `flutter run -d chrome` with DevTools to switch.
 4. **Use `Theme.of(context)` not `context.theme`.** Clearer and more explicit.
-5. **Localize text using ARB files, not static strings.** See [i18n-tone-guide.md](i18n-tone-guide.md).
+5. **Localize text using ARB files, not static strings.** See [i18n-guide.md](i18n-guide.md).
 
 ## Custom Widgets
 

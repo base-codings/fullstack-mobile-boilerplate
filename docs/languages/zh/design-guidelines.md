@@ -254,7 +254,7 @@ IconButton(
 
 ## 导航
 
-使用 **go_router**（见 [system-architecture.md](system-architecture.md#前端架构)）。
+使用 **go_router**（见 [architecture.md](architecture.md#前端架构)）。
 
 **在 lib/core/router/app_router.dart 中定义路由：**
 ```dart
@@ -313,7 +313,7 @@ AnimatedBuilder(
 2. **避免自定义 ThemeData，除非必要。** Material 3 覆盖 95% 用例。
 3. **同时测试浅色和深色主题。** 使用 `flutter run -d chrome` 与 DevTools 切换。
 4. **使用 `Theme.of(context)` 非 `context.theme`。** 更清晰、更明确。
-5. **使用 ARB 文件本地化文本，非静态字符串。** 见 [i18n-tone-guide.md](i18n-tone-guide.md)。
+5. **使用 ARB 文件本地化文本，非静态字符串。** 见 [i18n-guide.md](i18n-guide.md)。
 
 ## 自定义组件
 

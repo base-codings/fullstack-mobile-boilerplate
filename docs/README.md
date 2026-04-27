@@ -2,94 +2,67 @@
 
 > 🌐 **Language:** **English** · [Tiếng Việt](languages/vi/README.md) · [中文](languages/zh/README.md) · [한국어](languages/ko/README.md)
 
-Welcome to the mobile-boilerplate documentation suite. This project is a production-grade monorepo scaffold for shipping Flutter+NestJS+Postgres applications.
+Production-grade monorepo scaffold for shipping Flutter + NestJS + Postgres applications.
 
-## Getting Started
+## Start Here
 
-**New to this boilerplate?** Start here:
-- [**Local Development Setup**](guides/local-development.md) — prerequisites, clone, configure, run (15 min)
-- [**Project Overview & PDR**](project-overview-pdr.md) — what this is, who it's for, out-of-scope decisions
-- [**Architecture Overview**](system-architecture.md) — data flow, layers, OpenAPI codegen pipeline
+- [**Getting Started**](guides/getting-started.md) — prerequisites, clone, configure, run (15 min)
+- [**Overview**](overview.md) — what this is, who it's for, out-of-scope decisions
+- [**Architecture**](architecture.md) — data flow, layers, OpenAPI codegen pipeline
 
-## Building Features
+## Recipes (Building Features)
 
-**Adding backend API?**
-- [**Add a New Backend Module**](guides/add-new-backend-module.md) — recipe for NestJS controller+service+DTO with auth/envelope rules
-- [**Add a Prisma Model**](guides/add-prisma-module.md) — extend database schema + wire into service layer
-- [**API Contract Workflow**](guides/api-contract-workflow.md) — when you change an API, regenerate Dart client + sync tests
-
-**Adding Flutter feature?**
-- [**Add a New Flutter Feature**](guides/add-new-flutter-feature.md) — directory structure, repository pattern, Riverpod providers, routing, tests
-
-**Translating UI?**
-- [**i18n Tone Guide**](i18n-tone-guide.md) — how to add translation keys, pluralization rules, add new locales
+- [**Backend Module**](guides/backend-module.md) — NestJS controller + service + DTO with auth/envelope rules
+- [**Prisma Module**](guides/prisma-module.md) — extend database schema + wire into service layer
+- [**Flutter Feature**](guides/flutter-feature.md) — directory layout, repository pattern, Riverpod, routing, tests
+- [**API Contract**](guides/api-contract.md) — regenerate Dart client + sync tests when an API changes
 
 ## Reference
 
-**Understand the codebase:**
-- [**Codebase Summary**](codebase-summary.md) — file tree with quick-reference table ("where do I add a new X?")
-- [**Code Standards**](code-standards.md) — file naming, max 200 lines, TypeScript/Dart style, test structure, commit message format, linting rules
-- [**System Architecture**](system-architecture.md) — layers, responsibilities, envelope shape `{ data, meta, requestId }`
-- [**Feature Boundaries**](feature-boundaries.md) — module isolation rules (backend modules + frontend features cannot cross-import)
-- [**Dependency Injection Patterns**](di-factory-pattern.md) — NestJS providers/scopes, Riverpod providers/overrides, worked examples
-- [**Design Guidelines**](design-guidelines.md) — Material 3 theme, typography, spacing, reusable widgets
+| Doc | Purpose |
+|---|---|
+| [Codebase Map](codebase-map.md) | File tree + quick-reference ("where do I add a new X?") |
+| [Code Standards](code-standards.md) | Naming, file size, TS/Dart style, test structure, commit format |
+| [Feature Boundaries](feature-boundaries.md) | Module isolation rules (no cross-imports) |
+| [Dependency Injection](dependency-injection.md) | NestJS providers/scopes, Riverpod overrides, worked examples |
+| [Design Guidelines](design-guidelines.md) | Material 3 theme, typography, spacing, reusable widgets |
+| [i18n Guide](i18n-guide.md) | ARB workflow, translation keys, pluralization, adding locales |
+| [Deployment](deployment.md) | Docker backend, app signing, semantic-release flow |
+| [Changelog](../CHANGELOG.md) | Release notes (Keep a Changelog, auto-updated by semantic-release) |
 
-**Deploy & Release:**
-- [**Deployment Guide**](deployment-guide.md) — Docker backend, app signing, semantic-release flow (main=prod, beta=prerelease)
-
-**Track Changes:**
-- [**Project Changelog**](project-changelog.md) — keep a changelog format, auto-updated by semantic-release
-
-## Quick Links
-
-| Task | Link |
-|------|------|
-| Setup local dev | [local-development.md](guides/local-development.md) |
-| Add API endpoint | [add-new-backend-module.md](guides/add-new-backend-module.md) |
-| Add database table | [add-prisma-module.md](guides/add-prisma-module.md) |
-| Add Flutter screen | [add-new-flutter-feature.md](guides/add-new-flutter-feature.md) |
-| Regenerate API client | [api-contract-workflow.md](guides/api-contract-workflow.md) |
-| Add translation strings | [i18n-tone-guide.md](i18n-tone-guide.md) |
-| Understand code layout | [codebase-summary.md](codebase-summary.md) |
-| Deploy to production | [deployment-guide.md](deployment-guide.md) |
-
-## Content Structure
+## Structure
 
 ```
 docs/
-├── README.md (this file)
-├── project-overview-pdr.md
-├── system-architecture.md
+├── README.md             ← this file
+├── overview.md
+├── architecture.md
+├── codebase-map.md
 ├── code-standards.md
-├── codebase-summary.md
 ├── design-guidelines.md
-├── deployment-guide.md
 ├── feature-boundaries.md
-├── di-factory-pattern.md
-├── i18n-tone-guide.md
-├── project-changelog.md
+├── dependency-injection.md
+├── i18n-guide.md
+├── deployment.md
 ├── guides/
-│   ├── add-new-backend-module.md
-│   ├── add-new-flutter-feature.md
-│   ├── add-prisma-module.md
-│   ├── api-contract-workflow.md
-│   └── local-development.md
+│   ├── getting-started.md
+│   ├── backend-module.md
+│   ├── prisma-module.md
+│   ├── flutter-feature.md
+│   └── api-contract.md
 └── languages/
-    ├── vi/  (Vietnamese translations)
-    ├── zh/  (Simplified Chinese translations)
-    └── ko/  (Korean translations)
+    ├── vi/   ← Vietnamese mirrors
+    ├── zh/   ← Simplified Chinese mirrors
+    └── ko/   ← Korean mirrors
 ```
 
-## For Specific Roles
+The project changelog lives at [`/CHANGELOG.md`](../CHANGELOG.md) (root, with translations under `docs/languages/{lang}/CHANGELOG.md`).
 
-**Backend Developer:** Read [code-standards.md](code-standards.md) → [add-new-backend-module.md](guides/add-new-backend-module.md) → [feature-boundaries.md](feature-boundaries.md)
+## By Role
 
-**Mobile Developer:** Read [local-development.md](guides/local-development.md) → [add-new-flutter-feature.md](guides/add-new-flutter-feature.md) → [i18n-tone-guide.md](i18n-tone-guide.md)
-
-**DevOps/Infra:** Read [deployment-guide.md](deployment-guide.md) → [system-architecture.md](system-architecture.md)
-
-**New Contributor:** Read [project-overview-pdr.md](project-overview-pdr.md) → [local-development.md](guides/local-development.md) → [codebase-summary.md](codebase-summary.md)
-
----
-
-**Last updated:** April 2026
+| Role | Read order |
+|---|---|
+| Backend Dev | [code-standards](code-standards.md) → [backend-module](guides/backend-module.md) → [feature-boundaries](feature-boundaries.md) |
+| Mobile Dev | [getting-started](guides/getting-started.md) → [flutter-feature](guides/flutter-feature.md) → [i18n-guide](i18n-guide.md) |
+| DevOps / Infra | [deployment](deployment.md) → [architecture](architecture.md) |
+| New Contributor | [overview](overview.md) → [getting-started](guides/getting-started.md) → [codebase-map](codebase-map.md) |

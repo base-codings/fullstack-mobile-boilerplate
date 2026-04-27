@@ -254,7 +254,7 @@ IconButton(
 
 ## 네비게이션
 
-**go_router** 사용 ([system-architecture.md](system-architecture.md#프론트엔드-아키텍처) 참고).
+**go_router** 사용 ([architecture.md](architecture.md#프론트엔드-아키텍처) 참고).
 
 **lib/core/router/app_router.dart에서 라우트 정의:**
 ```dart
@@ -313,7 +313,7 @@ AnimatedBuilder(
 2. **필요하지 않으면 커스텀 ThemeData 피하기.** Material 3는 95% 사용 사례 커버.
 3. **Light와 dark 테마 모두 테스트.** `flutter run -d chrome`에서 DevTools로 전환.
 4. **`context.theme` 아닌 `Theme.of(context)` 사용.** 더 명확하고 명시적.
-5. **정적 문자열이 아닌 ARB 파일로 텍스트 로컬화.** [i18n-tone-guide.md](i18n-tone-guide.md) 참고.
+5. **정적 문자열이 아닌 ARB 파일로 텍스트 로컬화.** [i18n-guide.md](i18n-guide.md) 참고.
 
 ## 커스텀 위젯
 

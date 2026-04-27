@@ -100,7 +100,7 @@ mobile-boilerplate/
 └── .github/workflows/    # api-ci, mobile-ci, codegen-check, release
 ```
 
-→ Full file map: [docs/codebase-summary.md](docs/codebase-summary.md)
+→ Full file map: [docs/codebase-map.md](docs/codebase-map.md)
 
 ## Common Commands
 
@@ -117,17 +117,23 @@ mobile-boilerplate/
 
 ## Documentation
 
-| Doc                                                             | Purpose                |
-| --------------------------------------------------------------- | ---------------------- |
-| [Local development](docs/guides/local-development.md)           | Detailed onboarding    |
-| [Add a backend module](docs/guides/add-new-backend-module.md)   | Recipe                 |
-| [Add a Prisma model](docs/guides/add-prisma-module.md)          | Recipe                 |
-| [Add a Flutter feature](docs/guides/add-new-flutter-feature.md) | Recipe                 |
-| [API contract workflow](docs/guides/api-contract-workflow.md)   | Codegen flow           |
-| [System architecture](docs/system-architecture.md)              | High-level design      |
-| [Code standards](docs/code-standards.md)                        | Conventions            |
-| [Feature boundaries](docs/feature-boundaries.md)                | Module isolation rules |
-| [Deployment guide](docs/deployment-guide.md)                    | Release flow           |
+| Doc                                                          | Purpose                |
+| ------------------------------------------------------------ | ---------------------- |
+| [Getting started](docs/guides/getting-started.md)            | First-time setup       |
+| [Backend module recipe](docs/guides/backend-module.md)       | Add NestJS module      |
+| [Prisma module recipe](docs/guides/prisma-module.md)         | Add database model     |
+| [Flutter feature recipe](docs/guides/flutter-feature.md)     | Add mobile feature     |
+| [API contract](docs/guides/api-contract.md)                  | Codegen flow           |
+| [Overview](docs/overview.md)                                 | Scope, audience        |
+| [Architecture](docs/architecture.md)                         | High-level design      |
+| [Codebase map](docs/codebase-map.md)                         | File-tree quick ref    |
+| [Code standards](docs/code-standards.md)                     | Conventions            |
+| [Design guidelines](docs/design-guidelines.md)               | UI/UX rules            |
+| [Feature boundaries](docs/feature-boundaries.md)             | Module isolation rules |
+| [Dependency injection](docs/dependency-injection.md)         | DI patterns            |
+| [i18n guide](docs/i18n-guide.md)                             | Translation workflow   |
+| [Deployment](docs/deployment.md)                             | Release flow           |
+| [Changelog](CHANGELOG.md)                                    | Release notes          |
 
 → Full index: [docs/README.md](docs/README.md)
 
