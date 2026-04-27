@@ -1,0 +1,58 @@
+name: API Client Codegen Check
+
+on:
+  pull_request:
+    paths:
+      - 'apps/api/src/**'
+      - 'packages/api_client/**'
+      - 'tools/codegen/**'
+      - '.github/workflows/codegen-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v3.0.0
+        with:
+          version: 9
+
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - id: flutter_version
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225 # v2.16.0
+        with:
+          flutter-version: ${{ steps.flutter_version.outputs.version }}
+          cache: true
+
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - run: pnpm --filter @mobile-boilerplate/api exec prisma generate
+
+      # SKIP_DB injected inside tools/codegen/export-openapi.ts — no env needed here.
+      - run: pnpm codegen:api
+
+      - name: Verify api_client up-to-date
+        run: |
+          if [ -n "$(git status --porcelain packages/api_client)" ]; then
+            echo "::error::packages/api_client out of sync. Run 'pnpm codegen:api' locally and commit."
+            git status packages/api_client
+            git diff packages/api_client
+            exit 1
+          fi

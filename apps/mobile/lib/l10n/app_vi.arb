@@ -1,0 +1,7 @@
+{
+  "@@locale": "vi",
+  "helloTitle": "Xin chào",
+  "helloLoading": "Đang tải...",
+  "helloErrorRetry": "Thử lại",
+  "helloRefresh": "Làm mới"
+}

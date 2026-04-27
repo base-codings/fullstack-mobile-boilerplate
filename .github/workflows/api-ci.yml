@@ -1,0 +1,55 @@
+name: API CI
+
+on:
+  pull_request:
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/api-ci.yml'
+  push:
+    branches: [main, beta, dev]
+    paths:
+      - 'apps/api/**'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+concurrency:
+  group: api-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    steps:
+      # SHA pins — defense against mutable-tag supply chain attacks.
+      # Update via dependabot weekly PRs (.github/dependabot.yml).
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v3.0.0
+        with:
+          version: 9
+
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      # --ignore-scripts blocks postinstall hijack; run prisma generate explicitly.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - run: pnpm --filter @mobile-boilerplate/api exec prisma generate
+
+      - run: pnpm --filter @mobile-boilerplate/api lint
+
+      - run: pnpm --filter @mobile-boilerplate/api test
+
+      - run: pnpm --filter @mobile-boilerplate/api build

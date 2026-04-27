@@ -1,0 +1,6 @@
+# Minimal l10n config — Phase 05 populates arb files and expands this.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false

@@ -1,0 +1,19 @@
+{
+  "@@locale": "en",
+  "helloTitle": "Hello",
+  "@helloTitle": {
+    "description": "Hello screen app bar title"
+  },
+  "helloLoading": "Loading...",
+  "@helloLoading": {
+    "description": "Loading state message on hello screen"
+  },
+  "helloErrorRetry": "Retry",
+  "@helloErrorRetry": {
+    "description": "Retry button label after a failed network call"
+  },
+  "helloRefresh": "Refresh",
+  "@helloRefresh": {
+    "description": "Pull-to-refresh hint label"
+  }
+}

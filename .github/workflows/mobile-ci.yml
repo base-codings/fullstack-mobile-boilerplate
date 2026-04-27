@@ -1,0 +1,53 @@
+name: Mobile CI
+
+on:
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/api_client/**'
+      - '.fvmrc'
+      - '.github/workflows/mobile-ci.yml'
+  push:
+    branches: [main, beta, dev]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/api_client/**'
+      - '.fvmrc'
+
+concurrency:
+  group: mobile-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          persist-credentials: false
+
+      # subosito/flutter-action does not parse FVM JSON .fvmrc — extract via jq.
+      - id: flutter_version
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225 # v2.16.0
+        with:
+          flutter-version: ${{ steps.flutter_version.outputs.version }}
+          cache: true
+
+      - run: flutter pub get
+        working-directory: apps/mobile
+
+      - run: dart run build_runner build --delete-conflicting-outputs
+        working-directory: apps/mobile
+
+      - run: flutter analyze --fatal-infos
+        working-directory: apps/mobile
+
+      - run: flutter test --coverage
+        working-directory: apps/mobile
+
+      # APK build kept on push-to-main only (slow + low signal on PR).

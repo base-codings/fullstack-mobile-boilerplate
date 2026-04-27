@@ -1,0 +1,35 @@
+{
+  "name": "mobile-boilerplate",
+  "version": "0.0.0-development",
+  "private": true,
+  "description": "Monorepo boilerplate: Flutter mobile + NestJS API + shared OpenAPI Dart client",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "volta": {
+    "node": "20.18.0",
+    "pnpm": "9.12.0"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "prepare": "lefthook install || true",
+    "bootstrap": "pnpm install && pnpm codegen:api && melos bootstrap",
+    "lint": "pnpm -r --if-present lint && melos run analyze",
+    "test": "pnpm -r --if-present test && melos run test",
+    "format": "pnpm -r --if-present format && melos run format",
+    "codegen:api": "bash tools/codegen/generate-api-client.sh",
+    "test:cov": "pnpm --filter @mobile-boilerplate/api test:cov && (cd apps/mobile && fvm flutter test --coverage)"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@openapitools/openapi-generator-cli": "^2.13.4",
+    "husky": "^9.1.6",
+    "lefthook": "^1.7.18",
+    "lint-staged": "^15.2.10",
+    "melos": "^6.2.0",
+    "only-allow": "^1.2.1"
+  }
+}

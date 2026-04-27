@@ -1,0 +1,24 @@
+// Prisma schema — initial state intentionally empty.
+//
+// Boilerplate ships zero models. Adopters add their first model by following
+// docs/guides/add-prisma-module.md (created in Phase 11).
+//
+// Connection strings live in apps/api/.env:
+//   DATABASE_URL  — pooled (PgBouncer transaction mode, port 6543) for runtime
+//   DIRECT_URL    — direct (port 5432) for migrations
+//
+// Set SKIP_DB=true in .env to boot the API without a database connection
+// (used by the OpenAPI codegen pipeline; see tools/codegen/export-openapi.ts).
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Add models below. See docs/guides/add-prisma-module.md.

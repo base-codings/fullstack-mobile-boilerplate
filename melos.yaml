@@ -1,0 +1,26 @@
+name: mobile_boilerplate
+
+packages:
+  - apps/mobile
+  - packages/api_client
+
+command:
+  bootstrap:
+    runPubGetInParallel: true
+
+scripts:
+  analyze:
+    description: Run dart analyze in all packages
+    run: melos exec -- "fvm dart analyze ."
+
+  test:
+    description: Run flutter test in all packages
+    run: melos exec --scope="*mobile*" -- "fvm flutter test"
+
+  format:
+    description: Run dart format in all packages
+    run: melos exec -- "fvm dart format ."
+
+  build_runner:
+    description: Run build_runner in all packages that need it
+    run: melos exec --depends-on="build_runner" -- "fvm dart run build_runner build --delete-conflicting-outputs"

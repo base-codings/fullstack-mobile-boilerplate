@@ -1,0 +1,43 @@
+name: mobile_boilerplate
+description: Mobile boilerplate Flutter app.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  dio: ^5.7.0
+  go_router: ^14.6.0
+  flutter_dotenv: ^5.2.1
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  intl: any
+  api_client:
+    path: ../../packages/api_client
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  riverpod_generator: ^2.4.0
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  custom_lint: ^0.6.7
+  riverpod_lint: ^2.3.13
+  very_good_analysis: ^6.0.0
+  mocktail: ^1.0.4
+
+flutter:
+  generate: true # for gen_l10n in Phase 05
+  uses-material-design: true
+  assets:
+    - .env # ★ single .env file (gitignored). Adopter copies from .env.example.
+    # <!-- Red Team #11, #15 -->: Only non-secret runtime config here.
+    # Secrets MUST come from flutter_secure_storage (Keychain/Keystore).

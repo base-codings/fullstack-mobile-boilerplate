@@ -1,0 +1,16 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  errors:
+    avoid_relative_lib_imports: error
+  plugins:
+    - custom_lint
+  exclude:
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'
+    - 'lib/l10n/generated/**'
+
+linter:
+  rules:
+    always_use_package_imports: true
+    avoid_relative_lib_imports: true
