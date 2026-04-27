@@ -123,6 +123,30 @@ export class PrismaModule {}
 export class DatabaseModule {}
 ```
 
+### 인증 가드 패턴
+
+보일러플레이트는 **기본 거부** 가드 계약을 사용합니다:
+
+- `@Public()` — 라우트는 익명 트래픽에 개방
+- `@RequireAuth()` — 라우트는 인증 필요 (마커만; 가드 바인딩 없음)
+- 데코레이터 없음 → 501 Not Implemented (명시적 의도 강제)
+
+활성 전역 가드는 메타데이터를 읽어서 강제 여부 결정. 실제 인증 구현으로 교체하려면
+`app.module.ts`에서 한 줄만 변경:
+
+```ts
+{ provide: APP_GUARD, useClass: NotImplementedAuthGuard }
+// 다음으로 변경
+{ provide: APP_GUARD, useClass: JwtAuthGuard }
+```
+
+대체 가드는 반드시 두 메타데이터 키를 준수해야 합니다:
+
+- `IS_PUBLIC_KEY` — 인증 우회
+- `REQUIRES_AUTH_KEY` — 인증 강제
+
+그렇지 않으면 명시적 의도 계약이 깨집니다.
+
 ### 전역 제공자 (app.module.ts)
 
 한 번 등록; 모든 모듈에서 명시적 import 없이 사용 가능:

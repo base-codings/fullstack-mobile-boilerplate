@@ -1,57 +1,81 @@
-import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import helmet from 'helmet';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import type { AppEnv } from './config/env.schema';
+import { AppConfig } from './config/app.config';
 
 /**
  * Applies all global wiring to the NestJS application instance.
  *
  * Extracted so that e2e tests can reuse IDENTICAL configuration:
- *   const app = await Test.createTestingModule({ imports: [AppModule] }).compile();
- *   const nestApp = app.createNestApplication();
- *   await bootstrapApp(nestApp);
- *   await nestApp.init();
+ *   const app = moduleRef.createNestApplication<NestExpressApplication>({ bufferLogs: true });
+ *   await bootstrapApp(app);
+ *   await app.init();
  *
- * Red Team #3: bootstrapApp ensures test config == runtime config.
+ * RT-6: bootstrapApp ensures test config == runtime config.
  */
-export async function bootstrapApp(app: INestApplication): Promise<void> {
-  const config = app.get(ConfigService<AppEnv, true>);
+export async function bootstrapApp(app: NestExpressApplication): Promise<void> {
+  const config = app.get(AppConfig); // ★ M2: use typed wrapper
 
-  const nodeEnv = config.get('NODE_ENV', { infer: true });
-  const apiPrefix = config.get('API_PREFIX', { infer: true });
-  const corsOriginsRaw = config.get('CORS_ORIGINS', { infer: true });
-  const enableSwagger = config.get('ENABLE_SWAGGER', { infer: true });
+  // ★ H6: trust proxy BEFORE any middleware that reads req.ip
+  if (config.trustProxy > 0) {
+    app.set('trust proxy', config.trustProxy);
+  }
 
-  // Security: helmet sets sensible HTTP headers — ON by default, Red Team #6
-  app.use(helmet());
+  // ★ L5 (RT-1): explicit body-size limits via NestJS API.
+  // Do NOT use raw `app.use(express.json(...))` — Nest auto-registers its own
+  // body parsers; raw Express middleware double-parses or is overridden silently.
+  app.useBodyParser('json', { limit: config.bodyLimit });
+  app.useBodyParser('urlencoded', { extended: true, limit: config.bodyLimit });
 
-  // API prefix (e.g. /api/hello, /api/health)
-  app.setGlobalPrefix(apiPrefix);
+  // ★ H5 (RT-3 / Q4): helmet CSP gated by NODE_ENV + Swagger flag.
+  //   - dev:                    CSP disabled (fast iteration)
+  //   - non-dev + Swagger ON:   CSP allowlist with 'unsafe-inline' for Swagger UI
+  //                             (TRADE-OFF: weakens XSS protection — adopters MUST treat
+  //                             ENABLE_SWAGGER=true in non-dev as short-term debug only,
+  //                             never leave on in production. Documented in deployment.md.)
+  //   - non-dev + Swagger OFF:  helmet defaults (strict CSP)
+  const isDev = config.nodeEnv === 'development';
+  app.use(
+    helmet({
+      contentSecurityPolicy: isDev
+        ? false
+        : config.isSwaggerEnabled
+          ? {
+              directives: {
+                ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+                'script-src': ["'self'", "'unsafe-inline'"],
+                'img-src': ["'self'", 'data:', 'https:'],
+              },
+            }
+          : undefined, // helmet defaults — strict CSP
+      crossOriginEmbedderPolicy: config.isSwaggerEnabled ? false : undefined,
+    }),
+  );
 
-  // CORS: parse CSV → array of exact origins
-  // Red Team #2: reject '*' — wildcards with credentials are a security hazard.
-  // Native mobile clients don't need CORS; enable only for web debug origins.
-  const origins = corsOriginsRaw
-    ? corsOriginsRaw.split(',').map((o) => o.trim()).filter(Boolean)
-    : [];
+  // ★ H4 (RT-2): setGlobalPrefix. The `exclude` is a defensive guard — Swagger mounts
+  // as Express middleware (not a Nest controller route), so global prefix shouldn't
+  // affect it in practice. Verify empirically post-deploy with:
+  //   curl http://localhost:3000/api-docs        → 200 (Swagger UI)
+  //   curl http://localhost:3000/api/api-docs    → 404 (no double-prefix)
+  // If the exclude turns out unnecessary, drop it in a follow-up.
+  const apiPrefix = config.apiPrefix;
+  app.setGlobalPrefix(apiPrefix, {
+    exclude: [`${apiPrefix}-docs`, `${apiPrefix}-docs/json`],
+  });
 
+  // ★ C4: CORS — callback(null, false) instead of new Error → graceful reject
+  const origins = config.corsOrigins;
   if (origins.length > 0) {
     app.enableCors({
       origin: (requestOrigin, callback) => {
-        // Allow non-browser requests (native mobile, Postman, server-to-server)
         if (!requestOrigin) {
-          callback(null, true);
+          callback(null, true); // non-browser clients
           return;
         }
-        if (origins.includes(requestOrigin)) {
-          callback(null, true);
-        } else {
-          callback(new Error(`CORS: origin '${requestOrigin}' not allowed`));
-        }
+        callback(null, origins.includes(requestOrigin));
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -59,12 +83,11 @@ export async function bootstrapApp(app: INestApplication): Promise<void> {
     });
   }
 
-  // Swagger: gate by NODE_ENV === 'development' OR explicit ENABLE_SWAGGER=true
-  // Validation #4 / Red Team #6: NOT auto-enabled in staging/production
-  const isSwaggerEnabled =
-    nodeEnv === 'development' || enableSwagger === 'true';
+  // ★ M6: graceful shutdown for k8s/docker SIGTERM
+  app.enableShutdownHooks();
 
-  if (isSwaggerEnabled) {
+  // Swagger gating (unchanged)
+  if (config.isSwaggerEnabled) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Mobile Boilerplate API')
       .setDescription(
@@ -76,7 +99,6 @@ export async function bootstrapApp(app: INestApplication): Promise<void> {
       .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
-    // UI at /api-docs, JSON spec at /api-docs/json
     SwaggerModule.setup(`${apiPrefix}-docs`, app, document, {
       jsonDocumentUrl: `${apiPrefix}-docs/json`,
     });
@@ -84,17 +106,13 @@ export async function bootstrapApp(app: INestApplication): Promise<void> {
 }
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule, {
-    // Buffer logs until Pino logger is attached — prevents lost startup logs
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
-
-  // Attach the Pino logger for all NestJS internal logs
   app.useLogger(app.get(Logger));
-
   await bootstrapApp(app);
 
-  const port = process.env['PORT'] ?? 3000;
+  const port = app.get(AppConfig).port;
   await app.listen(port);
 }
 

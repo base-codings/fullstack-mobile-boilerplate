@@ -54,6 +54,14 @@
 
 **강제됨:** `TransformResponseInterceptor` (성공) + `AllExceptionsFilter` (오류)
 
+**`requestId` 폴백 체인:**
+1. `req.id` (pino-http에서 `genReqId`로 설정)
+2. `X-Request-ID` 헤더 (클라이언트 상관관계 허용)
+3. 신선한 `randomUUID()` (최후의 수단)
+
+이것은 모든 오류 응답이 usable 상관관계 ID를 가지도록 보장합니다. 심지어
+pino-http 미들웨어가 활성화되기 전에 오류가 발생할 때 (예: NestJS 내부 시작 오류).
+
 **생성된 클라이언트 (Dart):** 역직렬화는 자동으로 처리됨. 응답 타입은 `data` 필드만; `meta` + `requestId`는 컨텍스트를 통해 사용 가능.
 
 ## 백엔드 아키텍처

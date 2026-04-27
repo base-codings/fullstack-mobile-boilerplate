@@ -149,8 +149,8 @@ export class UsersController {
 | 装饰器 | 含义 | 用法 |
 |-----------|---------|-------|
 | `@Public()` | 路由公开可访问（无需认证） | `/login`、`/register`、`/health`、`/hello` |
-| `@RequireAuth()` | 路由需要有效认证 | `/users/:id`、`/profile`、管理员端点 |
-| 无 | **默认：禁止**（app.module 设置 NotImplementedAuthGuard） | 若未装饰则 501 错误 |
+| `@RequireAuth()` | 标记装饰器（设置元数据 + 在 Swagger 中添加 Bearer 认证）。全局守卫读取标记；无需在路由级绑定守卫。 | `/users/:id`、`/profile`、管理员端点 |
+| 无 | **默认：禁止**（app.module 设置 NotImplementedAuthGuard） | 若未装饰则 501 未实现错误 |
 
 **选择一个：**
 ```typescript
@@ -402,22 +402,38 @@ curl -X GET http://localhost:3000/users/1 \
 http://localhost:3000/api（开发模式）
 ```
 
-## 步骤 12：稍后添加真实认证
+## 步骤 12：添加真实认证（稍后）
 
-当准备好实现真实认证：
+准备好实现真实认证时：
 
-1. **实现 JwtAuthGuard**（或使用 Supabase Auth）
-2. **在 app.module.ts 中替换 NotImplementedAuthGuard：**
-   ```typescript
-   {
-     provide: APP_GUARD,
-     useClass: JwtAuthGuard,  // ← 在此交换
+1. 实现 `JwtAuthGuard` 尊重 `IS_PUBLIC_KEY` + （可选）`REQUIRES_AUTH_KEY` 元数据。
+
+   ```ts
+   // apps/api/src/common/auth/jwt-auth.guard.ts
+   import { ExecutionContext, Injectable } from '@nestjs/common';
+   import { Reflector } from '@nestjs/core';
+   import { AuthGuard } from '@nestjs/passport';
+   import { IS_PUBLIC_KEY } from './decorators/public.decorator';
+
+   @Injectable()
+   export class JwtAuthGuard extends AuthGuard('jwt') {
+     constructor(private readonly reflector: Reflector) {
+       super();
+     }
+
+     canActivate(context: ExecutionContext) {
+       const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+         context.getHandler(),
+         context.getClass(),
+       ]);
+       if (isPublic) return true;
+       return super.canActivate(context); // passport JWT
+     }
    }
    ```
-3. **装饰有 `@RequireAuth()` 的路由将正确门禁。**
-4. **装饰有 `@Public()` 的路由将继续绕过认证。**
 
-**无需控制器改动** — 装饰器已就位！
+2. 在 `apps/api/src/app.module.ts` 中，交换 `useClass: NotImplementedAuthGuard` → `useClass: JwtAuthGuard`。
+3. 所有现存的 `@Public()` 和 `@RequireAuth()` 装饰不变。无装饰的路由现在需要有效 JWT（passport 以 401 拒绝）。
 
 ## 故障排除
 

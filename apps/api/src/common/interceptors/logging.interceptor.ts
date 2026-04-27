@@ -1,13 +1,9 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import type { Request } from 'express';
+import { safeQueryString } from '../utils/safe-url';
 
 /**
  * Logs controller-level request/response duration.
@@ -22,12 +18,10 @@ export class LoggingInterceptor implements NestInterceptor {
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    const request = context
-      .switchToHttp()
-      .getRequest<Request & { id?: string }>();
+    const request = context.switchToHttp().getRequest<Request & { id?: string }>();
 
     const method = request.method;
-    const url = request.url;
+    const url = safeQueryString(request.url);
     const requestId = request.id ?? 'unknown';
     const start = Date.now();
 
@@ -39,14 +33,27 @@ export class LoggingInterceptor implements NestInterceptor {
         next: () => {
           const duration = Date.now() - start;
           this.logger.debug(
-            { requestId, method, url, handler: `${className}.${handlerName}`, durationMs: duration },
+            {
+              requestId,
+              method,
+              url,
+              handler: `${className}.${handlerName}`,
+              durationMs: duration,
+            },
             'Request handled',
           );
         },
         error: (err: unknown) => {
           const duration = Date.now() - start;
           this.logger.warn(
-            { requestId, method, url, handler: `${className}.${handlerName}`, durationMs: duration, err },
+            {
+              requestId,
+              method,
+              url,
+              handler: `${className}.${handlerName}`,
+              durationMs: duration,
+              err,
+            },
             'Request failed',
           );
         },

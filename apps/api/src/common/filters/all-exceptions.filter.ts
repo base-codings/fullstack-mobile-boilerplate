@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import {
   ArgumentsHost,
   Catch,
@@ -39,9 +40,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
 
-    // Extract requestId set by pino-http or the transform interceptor
+    // Extract requestId: pino-http sets req.id after genReqId runs, but early-stage
+    // exceptions (e.g. throttler 429) may fire before pino-http middleware runs.
+    // Fallback chain: req.id → x-request-id header → fresh UUID (never 'unknown').
+    const headerRequestId = request.headers['x-request-id'];
     const requestId =
-      (request as Request & { id?: string }).id ?? 'unknown';
+      (request as Request & { id?: string }).id ??
+      (typeof headerRequestId === 'string' ? headerRequestId : undefined) ??
+      randomUUID();
 
     let statusCode: number;
     let errorCode: string;

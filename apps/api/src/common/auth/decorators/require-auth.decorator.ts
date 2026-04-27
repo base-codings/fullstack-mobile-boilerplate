@@ -1,15 +1,18 @@
-import { applyDecorators, UseGuards } from '@nestjs/common';
+import { applyDecorators, SetMetadata } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { NotImplementedAuthGuard } from '../not-implemented-auth.guard';
+
+export const REQUIRES_AUTH_KEY = 'requiresAuth';
 
 /**
  * Marks a controller class or route handler as requiring authentication.
  *
- * Currently wired to NotImplementedAuthGuard which throws 501.
- * Replace by swapping the guard to a real JWT/session implementation.
+ * MARKER-ONLY: this decorator only sets metadata. The active global AuthGuard
+ * (e.g. NotImplementedAuthGuard, or your real JwtAuthGuard) reads the metadata
+ * and decides enforcement.
  *
- * Red Team #7: Applying this decorator makes the auth requirement explicit
- * in code rather than relying on "global guard by default" behaviour.
+ * Pattern: swap `useClass: NotImplementedAuthGuard` in app.module.ts to a real
+ * guard — every route already decorated with @RequireAuth() will be enforced
+ * automatically. No code edits needed elsewhere.
  *
  * @example
  * @RequireAuth()
@@ -17,4 +20,4 @@ import { NotImplementedAuthGuard } from '../not-implemented-auth.guard';
  * updateProfile(@Body() dto: UpdateProfileDto) { ... }
  */
 export const RequireAuth = () =>
-  applyDecorators(UseGuards(NotImplementedAuthGuard), ApiBearerAuth());
+  applyDecorators(SetMetadata(REQUIRES_AUTH_KEY, true), ApiBearerAuth());

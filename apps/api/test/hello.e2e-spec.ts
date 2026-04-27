@@ -4,7 +4,7 @@ process.env.SKIP_DB = 'true';
 process.env.DATABASE_URL ??= 'postgresql://stub:stub@localhost:5432/stub';
 process.env.NODE_ENV ??= 'test';
 
-import { INestApplication } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 
@@ -12,11 +12,11 @@ import { AppModule } from '../src/app.module';
 import { bootstrapApp } from '../src/main';
 
 describe('Hello (e2e)', () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    app = moduleRef.createNestApplication({ bufferLogs: true });
+    app = moduleRef.createNestApplication<NestExpressApplication>({ bufferLogs: true });
     // Reuse the same wiring as production main.ts (helmet, prefix, swagger gate, etc.)
     await bootstrapApp(app);
     await app.init();

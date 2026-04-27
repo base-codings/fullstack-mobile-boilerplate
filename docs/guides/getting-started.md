@@ -83,6 +83,13 @@ LOG_LEVEL=debug
 API_PORT=3000
 ```
 
+**New env vars (Phase 02 hardening):**
+
+| Var | Default | Description |
+|---|---|---|
+| `TRUST_PROXY` | `0` | Number of proxy hops in front. Set to `1` if behind LB/Cloudflare. |
+| `BODY_LIMIT` | `1mb` | Max JSON/urlencoded body size. Use multer for file uploads. |
+
 **Run migrations:**
 ```bash
 pnpm --filter @mobile-boilerplate/api prisma:migrate dev

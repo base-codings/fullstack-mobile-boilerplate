@@ -10,6 +10,23 @@ Mọi thay đổi đáng chú ý của dự án sẽ được ghi lại trong t�
 
 ## [Unreleased]
 
+### Đã thay đổi
+
+- **Backend security hardening (Phase 02 follow-up)**
+  - `@RequireAuth()` is now a marker-only decorator (no `UseGuards` binding) — global guard reads metadata
+  - Default-deny: routes without `@Public()` or `@RequireAuth()` throw 501 with explicit guidance
+  - CORS rejection no longer throws 500 (uses graceful `callback(null, false)`)
+  - Helmet CSP relaxed when Swagger enabled (UI was broken in dev)
+  - Swagger paths excluded from global API prefix (no more `/api/api-docs` collision)
+  - `TRUST_PROXY` env (default `0`) — set to hop count when behind LB/CDN
+  - `BODY_LIMIT` env (default `1mb`) — JSON/urlencoded body size cap
+  - `enableShutdownHooks()` — clean k8s/Docker SIGTERM
+  - `forbidUnknownValues` removed from ValidationPipe (footgun)
+  - `@SkipThrottle()` on `/api/health` (LB probes don't exhaust throttler budget)
+  - `requestId` fallback: `req.id` → `X-Request-ID` header → UUID (never empty)
+  - Query strings stripped from logs (PII protection)
+  - Prisma logs `emit: 'stdout'` (was `'event'` without subscriber → silent)
+
 ### Added
 
 - **Initial monorepo scaffold** — pnpm workspaces + Melos configuration

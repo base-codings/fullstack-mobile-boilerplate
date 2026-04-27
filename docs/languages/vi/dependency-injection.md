@@ -135,6 +135,29 @@ export class PrismaModule {}
 export class DatabaseModule {}
 ```
 
+### Auth guard pattern
+
+Boilerplate sử dụng **default-deny** guard contract:
+
+- `@Public()` — route mở cho traffic ẩn danh
+- `@RequireAuth()` — route yêu cầu authentication (chỉ marker; không bind guard)
+- Không decorator → 501 Not Implemented (buộc ý định tường minh)
+
+Guard toàn cầu hoạt động bằng cách đọc metadata để quyết định thực thi. Để thay thế bằng real auth implementation, chỉnh một dòng trong `app.module.ts`:
+
+```ts
+{ provide: APP_GUARD, useClass: NotImplementedAuthGuard }
+// thành
+{ provide: APP_GUARD, useClass: JwtAuthGuard }
+```
+
+Guard thay thế của bạn PHẢI tôn trọng cả hai metadata keys:
+
+- `IS_PUBLIC_KEY` — bỏ qua auth
+- `REQUIRES_AUTH_KEY` — thực thi auth
+
+Nếu không, explicit intent contract bị phá vỡ.
+
 ### Global Providers (app.module.ts)
 
 Registered once; available to all modules without explicit import:

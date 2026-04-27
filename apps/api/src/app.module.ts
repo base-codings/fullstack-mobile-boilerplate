@@ -1,10 +1,5 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import {
-  APP_FILTER,
-  APP_GUARD,
-  APP_INTERCEPTOR,
-  APP_PIPE,
-} from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppConfigModule } from './config/config.module';
 import { LoggerModule } from './infra/logger/logger.module';
@@ -41,9 +36,10 @@ import { HealthModule } from './modules/health/health.module';
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        forbidUnknownValues: true,
+        whitelist: true, // strip unknown properties
+        forbidNonWhitelisted: true, // reject body with extra properties (HTTP 400)
+        // forbidUnknownValues removed — known footgun with nested DTOs missing @Type()
+        // see: https://github.com/nestjs/nest/issues/9759
         transform: true,
         transformOptions: {
           // Explicit: no implicit type coercion — prevents "123" being cast to number silently

@@ -135,6 +135,30 @@ export class PrismaModule {}
 export class DatabaseModule {}
 ```
 
+### 认证守卫模式
+
+脚手架使用 **默认拒绝** 守卫合约：
+
+- `@Public()` — 路由对匿名流量开放
+- `@RequireAuth()` — 路由需要认证（仅标记；无守卫绑定）
+- 无装饰器 → 501 未实现（强制明确意图）
+
+活跃的全局守卫读取元数据来决定强制执行。要交换真实
+认证实现，改变 `app.module.ts` 中的一行：
+
+```ts
+{ provide: APP_GUARD, useClass: NotImplementedAuthGuard }
+// 变为
+{ provide: APP_GUARD, useClass: JwtAuthGuard }
+```
+
+你的替代守卫必须尊重两个元数据键：
+
+- `IS_PUBLIC_KEY` — 绕过认证
+- `REQUIRES_AUTH_KEY` — 强制认证
+
+否则明确意图合约会破裂。
+
 ### 全局 Provider (app.module.ts)
 
 一次注册；对所有模块可用，无需显式导入：

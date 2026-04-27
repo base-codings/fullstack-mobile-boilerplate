@@ -54,6 +54,14 @@
 
 **强制执行者:** `TransformResponseInterceptor`（成功）+ `AllExceptionsFilter`（错误）
 
+**`requestId` 回退链：**
+1. `req.id`（由 pino-http 通过 `genReqId` 设置）
+2. `X-Request-ID` 头（允许客户端关联）
+3. 新鲜 `randomUUID()`（最后手段）
+
+这确保每个错误响应都携带可用的关联 ID，即使在
+pino-http 中间件之前错误触发时（例如 NestJS 内部启动错误）。
+
 **生成的客户端（Dart）:** 反序列化自动处理。响应类型仅为 `data` 字段；`meta` + `requestId` 可通过上下文获得。
 
 ## 后端架构

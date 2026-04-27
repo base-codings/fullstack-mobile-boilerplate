@@ -68,6 +68,13 @@ LOG_LEVEL=debug
 API_PORT=3000
 ```
 
+**新增环境变量（Phase 02 强化）：**
+
+| 变量 | 默认值 | 描述 |
+|---|---|---|
+| `TRUST_PROXY` | `0` | 前面代理数量。如果在 LB/Cloudflare 后设置为 `1`。 |
+| `BODY_LIMIT` | `1mb` | 最大 JSON/urlencoded 体大小。使用 multer 处理文件上传。 |
+
 **运行迁移：**
 ```bash
 pnpm --filter @mobile-boilerplate/api prisma:migrate dev

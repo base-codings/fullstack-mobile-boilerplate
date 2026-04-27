@@ -304,6 +304,50 @@ version: 0.1.0+1  # 0.1.0 = 语义版本，1 = 构建号
 - 要回滚架构：`git revert <migration-commit>`，然后 `prisma migrate deploy`
 - **谨慎：** 可能数据丢失；重大迁移前备份
 
+## ⚠️ 非开发环境中的 Swagger
+
+设置 `ENABLE_SWAGGER=true` 在 `NODE_ENV=development` 之外宽松
+Content Security Policy：`script-src` 允许 `'unsafe-inline'` 使 Swagger
+UI 能渲染其内联脚本。
+
+**权衡：** XSS 保护被大幅削弱。任何用户可控
+内容在响应中反射时变为潜在可执行。
+
+**规则：**
+- ✅ 使用 `ENABLE_SWAGGER=true` 用于短期、监管的调试会话在暂存
+- ❌ 绝不在生产环境中开启
+- ❌ 绝不在长期暂存环境中设置（暴露给实际用户）
+
+若需要 Swagger 访问非开发 API 用于日常工作，使用
+独立 Swagger UI 客户端（浏览器扩展、Postman、Swagger Editor）
+指向 `/api-docs/json` — 保持服务器端 CSP 严格。
+
+## 反向代理后
+
+若 API 运行在负载均衡器、CDN 或反向代理后（Cloudflare、ALB、
+Render、Fly.io、Nginx 等），设置：
+
+```env
+TRUST_PROXY=1   # 1 跳 — 最常见
+TRUST_PROXY=2   # CDN → LB → 应用 — 设置为实际跳数
+```
+
+这使 `req.ip` 从 `X-Forwarded-For` 而非代理 IP 解析为真实客户端 IP。关键用于：
+
+- 速率限制（Throttler 按 IP 键值请求）
+- 审计日志
+- 安全分析
+
+**陷阱：** 绝不设置 `TRUST_PROXY` 高于真实跳数。
+更高值 = `X-Forwarded-For` 变可伪造，攻击者可伪造任意 IP。
+
+## 请求体限制
+
+`BODY_LIMIT=1mb` 覆盖 JSON/urlencoded 体。用于文件上传：
+
+1. 勿提升 `BODY_LIMIT` 吸收文件（影响所有路由）。
+2. 使用 `multer` 单个路由带明确限制：`FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } })`。
+
 ## 持续监控
 
 **设置告警：**

@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import { Public } from '../../common/auth/decorators/public.decorator';
 import { SkipTransform } from '../../common/interceptors/transform-response.interceptor';
 
@@ -10,12 +11,15 @@ interface HealthResponse {
 
 /**
  * Lightweight health check endpoint.
- * Red Team #7: @Public() — no auth required for infrastructure health probes.
- * Uses @SkipTransform() because load balancers/k8s probes expect the raw shape,
- * not the standard data envelope.
+ *
+ * - @Public(): no auth required for infra probes
+ * - @SkipTransform(): k8s/LB probes expect bare JSON, not envelope
+ * - @SkipThrottle(): LB probes can spam this every 5s without exhausting throttler budget
+ *   (avoids cascading failures when TRUST_PROXY=0 and all probes share LB IP)
  */
 @ApiTags('health')
 @Public()
+@SkipThrottle()
 @Controller('health')
 export class HealthController {
   @Get()

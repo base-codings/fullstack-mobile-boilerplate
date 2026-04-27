@@ -1,41 +1,43 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  NotImplementedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, NotImplementedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from './decorators/public.decorator';
+import { REQUIRES_AUTH_KEY } from './decorators/require-auth.decorator';
 
 /**
- * Default-deny auth guard — Red Team #7.
+ * Default-deny auth guard. Reads metadata set by @Public() / @RequireAuth().
  *
- * Ships in the boilerplate as the global AUTH guard so that:
- * 1. No endpoint is accidentally left unauthenticated if a real guard is forgotten.
- * 2. Routes must explicitly opt in to public access via @Public().
- * 3. Routes that need real auth throw 501 until a proper AuthGuard is implemented.
+ * Behavior:
+ *   - @Public()      → allow
+ *   - @RequireAuth() → throw 501 (real auth not wired yet)
+ *   - no decorator   → throw 501 (default-deny: missing intent declaration)
  *
- * Migration path: replace this guard with a real JWT/session guard and keep
- * the @Public() / @RequireAuth() decorator contract intact.
+ * Migration: swap this guard's useClass in app.module.ts for a real JWT/session
+ * guard. Replacement guard should follow the same metadata contract.
  */
 @Injectable()
 export class NotImplementedAuthGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    // Check both handler-level and class-level @Public() metadata
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
+    if (isPublic) return true;
 
-    if (isPublic) {
-      return true;
+    const requiresAuth = this.reflector.getAllAndOverride<boolean>(REQUIRES_AUTH_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (requiresAuth) {
+      throw new NotImplementedException(
+        'Auth not configured. Replace NotImplementedAuthGuard with a real AuthGuard in app.module.ts.',
+      );
     }
 
-    // No real auth configured — 501 is more honest than 401/403 here
     throw new NotImplementedException(
-      'Auth not configured. Decorate the route with @Public() or implement a real AuthGuard.',
+      'Default-deny: route is missing @Public() or @RequireAuth() decorator. ' +
+        'Every endpoint must declare its auth intent explicitly.',
     );
   }
 }

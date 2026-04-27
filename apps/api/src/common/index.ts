@@ -15,4 +15,4 @@ export { ApiStandardResponse } from './decorators/api-standard-response.decorato
 // Auth
 export { NotImplementedAuthGuard } from './auth/not-implemented-auth.guard';
 export { Public, IS_PUBLIC_KEY } from './auth/decorators/public.decorator';
-export { RequireAuth } from './auth/decorators/require-auth.decorator';
+export { RequireAuth, REQUIRES_AUTH_KEY } from './auth/decorators/require-auth.decorator';

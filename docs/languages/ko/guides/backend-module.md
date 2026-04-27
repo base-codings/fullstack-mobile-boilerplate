@@ -149,8 +149,25 @@ export class UsersController {
 | 데코레이터 | 의미 | 사용처 |
 |-----------|---------|-------|
 | `@Public()` | 라우트는 공개 (인증 불필요) | `/login`, `/register`, `/health`, `/hello` |
-| `@RequireAuth()` | 라우트는 유효 인증 필요 | `/users/:id`, `/profile`, admin 엔드포인트 |
-| None | **기본:금지** (app.module은 NotImplementedAuthGuard 설정) | 데코레이션 없으면 501 오류 |
+| `@RequireAuth()` | 마커 데코레이터 (메타데이터 설정 + Swagger에 Bearer 인증 추가). 전역 가드가 마커를 읽음; 라우트 레벨에서 가드를 바인딩하지 않습니다. | `/users/:id`, `/profile`, admin 엔드포인트 |
+| None | **기본: 금지됨** (app.module은 NotImplementedAuthGuard 설정) | 데코레이션 없으면 501 Not Implemented |
+
+**하나 선택:**
+```typescript
+// ✓ 좋음: 공개 등록
+@Post('register')
+@Public()
+async register(@Body() dto: RegisterDto) { }
+
+// ✓ 좋음: 비공개 사용자 조회
+@Get(':id')
+@RequireAuth()
+async getUser(@Param('id') id: string) { }
+
+// ✗ 나쁨: 데코레이터 없음 (기본 가드가 거부함)
+@Get('me')
+async getCurrentUser() { }  // 501 Not Implemented 발생
+```
 
 ## Step 5: Module 업데이트
 
@@ -389,18 +406,44 @@ http://localhost:3000/api (개발 모드)
 
 실제 인증을 구현할 준비가 되면:
 
-1. **JwtAuthGuard 구현** (또는 Supabase Auth 사용)
-2. **app.module.ts에서 NotImplementedAuthGuard 교체:**
-   ```typescript
-   {
-     provide: APP_GUARD,
-     useClass: JwtAuthGuard,  // ← 여기 교체
+1. `JwtAuthGuard` 구현 (IS_PUBLIC_KEY + REQUIRES_AUTH_KEY 메타데이터 준수):
+
+   ```ts
+   // apps/api/src/common/auth/jwt-auth.guard.ts
+   import { ExecutionContext, Injectable } from '@nestjs/common';
+   import { Reflector } from '@nestjs/core';
+   import { AuthGuard } from '@nestjs/passport';
+   import { IS_PUBLIC_KEY } from './decorators/public.decorator';
+
+   @Injectable()
+   export class JwtAuthGuard extends AuthGuard('jwt') {
+     constructor(private readonly reflector: Reflector) {
+       super();
+     }
+
+     canActivate(context: ExecutionContext) {
+       const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+         context.getHandler(),
+         context.getClass(),
+       ]);
+       if (isPublic) return true;
+       return super.canActivate(context); // passport JWT
+     }
    }
    ```
-3. **`@RequireAuth()`로 이미 데코레이트된 라우트는 자동 게이트됨.**
-4. **`@Public()`이 있는 라우트는 계속 인증 우회.**
 
-**controller 변경 불필요** — 데코레이터는 이미 제자리!
+2. `apps/api/src/app.module.ts`에서 `useClass: NotImplementedAuthGuard` → `useClass: JwtAuthGuard`로 교체.
+3. 기존 `@Public()` 및 `@RequireAuth()` 데코레이션은 변경 없이 작동. 데코레이터 없는 라우트는 이제 유효한 JWT 필요 (passport가 401로 거부).
+
+## 문제 해결
+
+| 이슈 | 해결 |
+|-------|----------|
+| "No controller found" | 모듈을 `app.module.ts`에서 import 확인 |
+| "Prisma model not found" | `prisma:migrate dev` + `prisma:generate` 실행 |
+| "Swagger endpoint missing" | Controller 메서드에서 raw `@ApiOkResponse` 대신 `@ApiStandardResponse(Dto)` 검증 |
+| "Generated client has ugly method names" | Controller 메서드에 `@ApiOperation({ operationId: 'verbNoun' })` 추가 |
+| "Validation fails unexpectedly" | ValidationPipe에서 `forbidNonWhitelisted: true` 확인 — 추가 필드 거부됨 |
 
 ## 문제 해결
 

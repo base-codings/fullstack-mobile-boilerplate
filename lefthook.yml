@@ -12,19 +12,23 @@ pre-commit:
   parallel: true
   commands:
     lint-api:
+      # `root` strips the `apps/api/` prefix from {staged_files} and runs
+      # the command with cwd = apps/api (so eslint resolves paths correctly).
+      root: "apps/api/"
       glob: "apps/api/**/*.{ts,js}"
-      run: pnpm --filter @mobile-boilerplate/api exec eslint --fix --max-warnings=0 {staged_files}
+      run: pnpm exec eslint --fix --max-warnings=0 {staged_files}
       stage_fixed: true
 
     format-api:
+      root: "apps/api/"
       glob: "apps/api/**/*.{ts,js,json,md}"
-      run: pnpm --filter @mobile-boilerplate/api exec prettier --write {staged_files}
+      run: pnpm exec prettier --write {staged_files}
       stage_fixed: true
 
     analyze-mobile:
+      root: "apps/mobile/"
       glob: "apps/mobile/**/*.dart"
       run: |
-        cd apps/mobile
         if command -v fvm >/dev/null; then
           fvm dart analyze --fatal-infos {staged_files}
         elif command -v dart >/dev/null; then
@@ -34,9 +38,9 @@ pre-commit:
         fi
 
     format-mobile:
+      root: "apps/mobile/"
       glob: "apps/mobile/**/*.dart"
       run: |
-        cd apps/mobile
         if command -v fvm >/dev/null; then
           fvm dart format {staged_files}
         elif command -v dart >/dev/null; then

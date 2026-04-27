@@ -80,6 +80,12 @@ export class CreateUserDto {
 }
 ```
 
+### Request validation
+
+- Global `ValidationPipe` configured with: `whitelist: true`, `forbidNonWhitelisted: true`, `transform: true`.
+- `forbidUnknownValues` is intentionally NOT set (left default false): combined with nested DTOs missing `@Type()` decorators, it produces cryptic "unknown values were given" errors. See nestjs/nest#9759.
+- Nested DTOs MUST decorate child fields with `@Type(() => NestedDto)` for transform/validation to descend.
+
 **Service injection via constructor:**
 ```typescript
 @Injectable()
@@ -415,6 +421,13 @@ try {
   rethrow; // Let provider handle state transition to error
 }
 ```
+
+### Logging
+
+- `pino-http` + `nestjs-pino` for structured JSON logs.
+- `redact:` paths cover `Authorization`, `Cookie`, password, token, refreshToken, email.
+- **Query strings stripped from logs by default** to avoid PII leak via `?token=...` etc. Re-enable per-endpoint by overriding the logger if needed.
+- `requestId` falls back: `req.id` (pino-http) → `X-Request-ID` header → fresh UUID. Never empty.
 
 ## Documentation Requirements
 

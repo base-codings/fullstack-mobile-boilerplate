@@ -148,9 +148,9 @@ export class UsersController {
 
 | Decorator | Ý Nghĩa | Sử Dụng |
 |-----------|---------|-------|
-| `@Public()` | Route is publicly accessible (no auth required) | `/login`, `/register`, `/health`, `/hello` |
-| `@RequireAuth()` | Route requires valid authentication | `/users/:id`, `/profile`, admin endpoints |
-| None | **Default: FORBIDDEN** (app.module sets NotImplementedAuthGuard) | Error 501 if not decorated |
+| `@Public()` | Route công khai (không cần auth) | `/login`, `/register`, `/health`, `/hello` |
+| `@RequireAuth()` | Marker-only decorator (không bind guard ở route level). Guard toàn cầu đọc metadata. | `/users/:id`, `/profile`, admin endpoints |
+| Không decorator | **Mặc định: FORBIDDEN** (app.module set NotImplementedAuthGuard) | Error 501 nếu không decorated |
 
 **Choose ONE:**
 ```typescript
@@ -406,18 +406,34 @@ http://localhost:3000/api (development mode)
 
 When you're ready to implement real auth:
 
-1. **Implement JwtAuthGuard** (or use Supabase Auth)
-2. **Replace NotImplementedAuthGuard in app.module.ts:**
-   ```typescript
-   {
-     provide: APP_GUARD,
-     useClass: JwtAuthGuard,  // ← Swap here
+1. Implement `JwtAuthGuard` honoring `IS_PUBLIC_KEY` + (optionally) `REQUIRES_AUTH_KEY` metadata.
+
+   ```ts
+   // apps/api/src/common/auth/jwt-auth.guard.ts
+   import { ExecutionContext, Injectable } from '@nestjs/common';
+   import { Reflector } from '@nestjs/core';
+   import { AuthGuard } from '@nestjs/passport';
+   import { IS_PUBLIC_KEY } from './decorators/public.decorator';
+
+   @Injectable()
+   export class JwtAuthGuard extends AuthGuard('jwt') {
+     constructor(private readonly reflector: Reflector) {
+       super();
+     }
+
+     canActivate(context: ExecutionContext) {
+       const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+         context.getHandler(),
+         context.getClass(),
+       ]);
+       if (isPublic) return true;
+       return super.canActivate(context); // passport JWT
+     }
    }
    ```
-3. **Routes already decorated with `@RequireAuth()` will gate properly.**
-4. **Routes with `@Public()` will continue to bypass auth.**
 
-**No controller changes needed** — decorators already in place!
+2. In `apps/api/src/app.module.ts`, swap `useClass: NotImplementedAuthGuard` → `useClass: JwtAuthGuard`.
+3. All existing `@Public()` and `@RequireAuth()` decorations work unchanged. Routes without a decorator now require a valid JWT (passport rejects with 401).
 
 ## Troubleshooting
 

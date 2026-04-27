@@ -26,7 +26,10 @@ export class AppConfig {
   get corsOrigins(): string[] {
     const raw = this.config.get('CORS_ORIGINS', { infer: true });
     if (!raw || raw.trim() === '') return [];
-    return raw.split(',').map((o) => o.trim()).filter(Boolean);
+    return raw
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
   }
 
   get logLevel(): AppEnv['LOG_LEVEL'] {
@@ -45,5 +48,13 @@ export class AppConfig {
 
   get isTest(): boolean {
     return this.nodeEnv === 'test';
+  }
+
+  get trustProxy(): number {
+    return this.config.get('TRUST_PROXY', { infer: true });
+  }
+
+  get bodyLimit(): string {
+    return this.config.get('BODY_LIMIT', { infer: true });
   }
 }

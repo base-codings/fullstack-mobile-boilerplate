@@ -15,10 +15,14 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private readonly logger = new Logger(PrismaService.name);
 
   constructor(private readonly config: ConfigService<AppEnv, true>) {
+    // emit: 'stdout' (Option A) — Prisma errors/warns surface via Node stdout and
+    // are visible in Docker/k8s log aggregation without requiring $on() subscribers.
+    // Option B (structured $on events wired to Pino) is documented in code-standards.md
+    // for adopters that need fully-structured DB log context in production.
     super({
       log: [
-        { emit: 'event', level: 'error' },
-        { emit: 'event', level: 'warn' },
+        { emit: 'stdout', level: 'error' },
+        { emit: 'stdout', level: 'warn' },
       ],
     });
   }

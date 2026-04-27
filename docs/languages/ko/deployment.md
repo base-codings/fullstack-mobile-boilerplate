@@ -304,6 +304,51 @@ version: 0.1.0+1  # 0.1.0 = semantic version, 1 = build number
 - 스키마 롤백: `git revert <migration-commit>`, 그 후 `prisma migrate deploy`
 - **주의:** 데이터 손실 가능; 주요 마이그레이션 전 백업
 
+## ⚠️ 비개발 환경에서 Swagger
+
+`NODE_ENV=development` 외에서 `ENABLE_SWAGGER=true`를 설정하면
+Content Security Policy를 완화합니다: `script-src`는 `'unsafe-inline'`을 허용하므로
+Swagger UI가 인라인 스크립트를 렌더링할 수 있습니다.
+
+**트레이드오프:** XSS 보호가 실질적으로 약화됩니다. 응답에 반영되는 사용자 제어 콘텐츠는
+잠재적으로 실행 가능해집니다.
+
+**규칙:**
+- ✅ staging에서 짧고 감시되는 디버그 세션 동안 `ENABLE_SWAGGER=true` 사용
+- ❌ 절대 프로덕션에서 활성화하지 말 것
+- ❌ 실제 사용자에게 노출된 오래 유지되는 staging 환경에서 설정하지 말 것
+
+비개발 API에 대해 루틴 업무를 위해 Swagger 접근이 필요한 경우,
+독립형 Swagger UI 클라이언트 (브라우저 확장, Postman, Swagger Editor)를
+`/api-docs/json`을 가리키도록 사용 — 서버 측 CSP는 엄격하게 유지.
+
+## 프록시 뒤에 있는 경우
+
+API가 로드 밸런서, CDN, 또는 역방향 프록시 (Cloudflare, ALB,
+Render, Fly.io, Nginx, 등) 뒤에서 실행되면:
+
+```env
+TRUST_PROXY=1   # 1 홉 — 가장 일반적
+TRUST_PROXY=2   # CDN → LB → app — 실제 홉 수로 설정
+```
+
+이것은 `req.ip`가 프록시의 IP 대신 `X-Forwarded-For`에서 실제 클라이언트 IP를
+해결하게 합니다. 다음에 중요합니다:
+
+- 속도 제한 (Throttler는 IP로 요청 키)
+- 감사 로그
+- 보안 분석
+
+**함정:** `TRUST_PROXY`를 실제 홉 수보다 높게 설정하지 말 것.
+높은 값 = `X-Forwarded-For`가 스푸핑 가능하므로 공격자가 모든 IP를 가장할 수 있음.
+
+## 요청 본문 크기 제한
+
+`BODY_LIMIT=1mb`는 JSON/urlencoded 본문을 다룹니다. 파일 업로드의 경우:
+
+1. 모든 라우트에 영향을 주도록 `BODY_LIMIT`을 높이지 마십시오.
+2. 라우트당 multer와 명시적 제한을 사용: `FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } })`.
+
 ## 지속적 모니터링
 
 **alert 설정:**

@@ -135,6 +135,30 @@ export class PrismaModule {}
 export class DatabaseModule {}
 ```
 
+### Auth guard pattern
+
+The boilerplate uses a **default-deny** guard contract:
+
+- `@Public()` — route is open to anonymous traffic
+- `@RequireAuth()` — route requires authentication (marker only; no guard binding)
+- No decorator → 501 Not Implemented (forces explicit intent)
+
+The active global guard reads metadata to decide enforcement. To swap in a real
+auth implementation, change one line in `app.module.ts`:
+
+```ts
+{ provide: APP_GUARD, useClass: NotImplementedAuthGuard }
+// becomes
+{ provide: APP_GUARD, useClass: JwtAuthGuard }
+```
+
+Your replacement guard MUST honor both metadata keys:
+
+- `IS_PUBLIC_KEY` — bypass auth
+- `REQUIRES_AUTH_KEY` — enforce auth
+
+Otherwise the explicit intent contract breaks.
+
 ### Global Providers (app.module.ts)
 
 Registered once; available to all modules without explicit import:

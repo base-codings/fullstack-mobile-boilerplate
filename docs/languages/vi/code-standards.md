@@ -80,6 +80,12 @@ export class CreateUserDto {
 }
 ```
 
+### Request validation
+
+- Global `ValidationPipe` configured with: `whitelist: true`, `forbidNonWhitelisted: true`, `transform: true`.
+- `forbidUnknownValues` is intentionally NOT set (left default false): combined with nested DTOs missing `@Type()` decorators, it produces cryptic "unknown values were given" errors. See nestjs/nest#9759.
+- Nested DTOs MUST decorate child fields with `@Type(() => NestedDto)` for transform/validation to descend.
+
 **Service injection via constructor:**
 ```typescript
 @Injectable()

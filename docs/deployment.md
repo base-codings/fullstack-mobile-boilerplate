@@ -304,6 +304,51 @@ version: 0.1.0+1  # 0.1.0 = semantic version, 1 = build number
 - To rollback schema: `git revert <migration-commit>`, then `prisma migrate deploy`
 - **Caution:** Data loss possible; backup before major migrations
 
+## ⚠️ Swagger in non-dev environments
+
+Setting `ENABLE_SWAGGER=true` outside `NODE_ENV=development` relaxes the
+Content Security Policy: `script-src` allows `'unsafe-inline'` so the Swagger
+UI can render its inline scripts.
+
+**Trade-off:** XSS protection is materially weakened. Any user-controllable
+content reflected in a response becomes potentially executable.
+
+**Rule:**
+- ✅ Use `ENABLE_SWAGGER=true` for short, supervised debug sessions in staging
+- ❌ Never leave it on in production
+- ❌ Never set in long-lived staging environments exposed to real users
+
+If you need Swagger access against a non-dev API for routine work, use a
+stand-alone Swagger UI client (browser extension, Postman, Swagger Editor)
+pointed at `/api-docs/json` — keep server-side CSP strict.
+
+## Behind a proxy
+
+If your API runs behind a load balancer, CDN, or reverse proxy (Cloudflare, ALB,
+Render, Fly.io, Nginx, etc.), set:
+
+```env
+TRUST_PROXY=1   # 1 hop — most common
+TRUST_PROXY=2   # CDN → LB → app — set to actual hop count
+```
+
+This makes `req.ip` resolve to the real client IP from `X-Forwarded-For` instead
+of the proxy's IP. Critical for:
+
+- Rate limiting (Throttler keys requests by IP)
+- Audit logs
+- Security analysis
+
+**Footgun:** never set `TRUST_PROXY` higher than the real hop count.
+Higher value = `X-Forwarded-For` becomes spoofable, attacker can fake any IP.
+
+## Request body limits
+
+`BODY_LIMIT=1mb` covers JSON/urlencoded bodies. For file uploads:
+
+1. Do NOT raise `BODY_LIMIT` to absorb files (affects all routes).
+2. Use `multer` per-route with explicit limit: `FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } })`.
+
 ## Continuous Monitoring
 
 **Set up alerts for:**

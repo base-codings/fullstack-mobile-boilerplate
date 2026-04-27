@@ -54,6 +54,14 @@ All API responses (success or error) wrap data in a standard envelope:
 
 **Enforced by:** `TransformResponseInterceptor` (success) + `AllExceptionsFilter` (errors)
 
+**`requestId` fallback chain:**
+1. `req.id` (set by pino-http via `genReqId`)
+2. `X-Request-ID` header (allows client correlation)
+3. Fresh `randomUUID()` (last resort)
+
+This ensures every error response carries a usable correlation ID even when
+errors fire before pino-http middleware (e.g., NestJS internal startup errors).
+
 **Generated client (Dart):** Deserialization handled automatically. Response type is `data` field only; `meta` + `requestId` available via context.
 
 ## Backend Architecture

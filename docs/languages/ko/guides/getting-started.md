@@ -68,6 +68,13 @@ LOG_LEVEL=debug
 API_PORT=3000
 ```
 
+**새 env 변수 (Phase 02 강화):**
+
+| Var | 기본값 | 설명 |
+|---|---|---|
+| `TRUST_PROXY` | `0` | 앞의 프록시 홉 수. LB/Cloudflare 뒤에 있으면 `1`로 설정. |
+| `BODY_LIMIT` | `1mb` | 최대 JSON/urlencoded 본문 크기. 파일 업로드에는 multer 사용. |
+
 **마이그레이션 실행:**
 ```bash
 pnpm --filter @mobile-boilerplate/api prisma:migrate dev

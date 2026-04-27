@@ -39,6 +39,20 @@ export const envSchema = z
      * Skip Prisma $connect on startup. Used by OpenAPI codegen path.
      */
     SKIP_DB: z.enum(['true', 'false']).optional(),
+
+    /**
+     * Trust proxy hop count. Set to 1 if behind one LB (typical: ALB, Cloudflare).
+     * Set to N for N proxy hops. Leave 0 in dev or when directly exposed.
+     * Affects: req.ip resolution → throttler keying, log correlation.
+     */
+    TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+
+    /**
+     * Maximum JSON/urlencoded body size. DoS hardening.
+     * For file uploads, use multer per-route instead of bumping this.
+     * Format: '100kb', '1mb', '10mb'.
+     */
+    BODY_LIMIT: z.string().default('1mb'),
   })
   .superRefine((data, ctx) => {
     if (data.SKIP_DB !== 'true' && (!data.DATABASE_URL || data.DATABASE_URL.length === 0)) {

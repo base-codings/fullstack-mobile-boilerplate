@@ -80,6 +80,12 @@ export class CreateUserDto {
 }
 ```
 
+### 요청 검증
+
+- 전역 `ValidationPipe`는 다음으로 설정됨: `whitelist: true`, `forbidNonWhitelisted: true`, `transform: true`.
+- `forbidUnknownValues`는 의도적으로 설정되지 않음 (기본값 false): 중첩 DTO와 함께 `@Type()` 데코레이터가 누락되면 암호화된 "unknown values were given" 오류가 발생합니다. nestjs/nest#9759 참조.
+- 중첩 DTO는 반드시 자식 필드를 `@Type(() => NestedDto)`로 데코레이트해야 변환/검증이 내려갑니다.
+
 **Constructor를 통한 서비스 주입:**
 ```typescript
 @Injectable()
@@ -167,6 +173,13 @@ class UserRepositoryImpl implements UserRepository {
   }
 }
 ```
+
+### 로깅
+
+- `pino-http` + `nestjs-pino`로 구조화된 JSON 로그.
+- `redact:` 경로는 `Authorization`, `Cookie`, password, token, refreshToken, email을 다룹니다.
+- **쿼리 문자열은 기본적으로 로그에서 제거됨** PII 누수를 피하기 위해 `?token=...` 등. 필요에 따라 로거를 오버라이드하여 엔드포인트당 다시 활성화.
+- `requestId` 폴백: `req.id` (pino-http) → `X-Request-ID` 헤더 → 신선한 UUID. 절대 비어있지 않음.
 
 ## 테스트 표준
 

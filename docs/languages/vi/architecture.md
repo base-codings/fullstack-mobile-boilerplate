@@ -54,6 +54,14 @@ Tất cả API responses (thành công hoặc lỗi) được bao trong một en
 
 **Được thực thi bởi:** `TransformResponseInterceptor` (thành công) + `AllExceptionsFilter` (lỗi)
 
+**`requestId` fallback chain:**
+1. `req.id` (set by pino-http via `genReqId`)
+2. `X-Request-ID` header (allows client correlation)
+3. Fresh `randomUUID()` (last resort)
+
+This ensures every error response carries a usable correlation ID even when
+errors fire before pino-http middleware (e.g., NestJS internal startup errors).
+
 **Generated client (Dart):** Deserialization được xử lý tự động. Response type là `data` field; `meta` + `requestId` có sẵn qua context.
 
 ## Kiến Trúc Backend

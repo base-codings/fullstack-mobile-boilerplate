@@ -416,6 +416,13 @@ try {
 }
 ```
 
+### 日志
+
+- `pino-http` + `nestjs-pino` 用于结构化 JSON 日志。
+- `redact:` 路径覆盖 `Authorization`、`Cookie`、password、token、refreshToken、email。
+- **查询字符串默认从日志中剥离** 避免通过 `?token=...` 等方式泄露 PII。需要时可通过覆盖日志器按端点重新启用。
+- `requestId` 回退链：`req.id`（pino-http）→ `X-Request-ID` 头 → 新鲜 UUID。永不为空。
+
 ## 文档要求
 
 **代码注释需要用于：**

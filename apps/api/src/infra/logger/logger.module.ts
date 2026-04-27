@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
 import type { AppEnv } from '../../config/env.schema';
+import { safeQueryString } from '../../common/utils/safe-url';
 
 /** PII fields to redact from all pino log entries. Red Team #9. */
 const REDACT_PATHS = [
@@ -38,8 +39,7 @@ const REDACT_PATHS = [
 
             // Attach requestId to every log entry for correlation
             genReqId: (req: { headers: Record<string, string | string[] | undefined> }) => {
-              const existing =
-                req.headers['x-request-id'] ?? req.headers['x-correlation-id'];
+              const existing = req.headers['x-request-id'] ?? req.headers['x-correlation-id'];
               if (existing && typeof existing === 'string') return existing;
               // Use crypto.randomUUID() available in Node 20+
               return crypto.randomUUID();
@@ -59,10 +59,11 @@ const REDACT_PATHS = [
                   },
                 }),
 
-            // Normalize req/res serialization
+            // Normalize req/res serialization — url passes through safeQueryString
+            // to prevent PII/token leaks in auto-logged pino-http entries (H2).
             serializers: {
               req(req: { method: string; url: string; id: string }) {
-                return { method: req.method, url: req.url, id: req.id };
+                return { method: req.method, url: safeQueryString(req.url), id: req.id };
               },
               res(res: { statusCode: number }) {
                 return { statusCode: res.statusCode };
