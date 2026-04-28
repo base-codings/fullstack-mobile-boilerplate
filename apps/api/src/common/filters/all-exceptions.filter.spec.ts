@@ -9,10 +9,7 @@ describe('AllExceptionsFilter', () => {
 
   beforeEach(() => {
     mockReply = jest.fn();
-    filter = new AllExceptionsFilter(
-      { httpAdapter: { reply: mockReply } } as never,
-      { error: jest.fn(), warn: jest.fn() } as never,
-    );
+    filter = new AllExceptionsFilter({ httpAdapter: { reply: mockReply } } as never);
     mockHost = {
       switchToHttp: () => ({
         getRequest: () => ({ id: 'req-123', headers: {} }),
