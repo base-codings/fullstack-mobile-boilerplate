@@ -1,3 +1,4 @@
+import 'package:mobile_boilerplate/core/error/failure.dart' show Failure;
 import 'package:mobile_boilerplate/features/hello/domain/entities/hello_message.dart';
 
 /// Abstract contract for the hello feature's data source.

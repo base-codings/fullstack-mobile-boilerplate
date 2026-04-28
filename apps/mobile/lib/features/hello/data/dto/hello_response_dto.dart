@@ -21,14 +21,14 @@ class HelloResponseDto {
     required this.timestamp,
   });
 
-  final String message;
-  final String timestamp;
-
   factory HelloResponseDto.fromJson(Map<String, dynamic> json) =>
       HelloResponseDto(
         message: json['message'] as String,
         timestamp: json['timestamp'] as String,
       );
+
+  final String message;
+  final String timestamp;
 
   @override
   String toString() =>

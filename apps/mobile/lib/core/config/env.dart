@@ -35,7 +35,7 @@ class AppEnv {
   /// switching env files — avoid per-flavor files that leak secrets
   /// into APK assets (Red Team #11).
   static Future<AppEnv> load(Flavor flavor) async {
-    await dotenv.load(fileName: '.env');
+    await dotenv.load();
 
     final raw = dotenv.maybeGet('API_BASE_URL') ?? 'auto';
     final prefix = dotenv.maybeGet('API_PREFIX') ?? '/api';

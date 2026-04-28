@@ -9,7 +9,7 @@
 ///   case UnknownFailure() => showGenericError(),
 /// }
 /// ```
-sealed class Failure {
+sealed class Failure implements Exception {
   const Failure(this.message);
 
   /// Human-readable description (for debug; not shown raw to users).

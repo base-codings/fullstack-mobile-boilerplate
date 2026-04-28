@@ -25,8 +25,7 @@ final helloControllerProvider =
 /// Consumers call [refresh] to retry on error or pull-to-refresh.
 class HelloController extends AsyncNotifier<HelloMessage> {
   @override
-  Future<HelloMessage> build() =>
-      ref.read(helloRepositoryProvider).getHello();
+  Future<HelloMessage> build() => ref.read(helloRepositoryProvider).getHello();
 
   /// Trigger a fresh load; updates state through loading → data/error.
   Future<void> refresh() async {

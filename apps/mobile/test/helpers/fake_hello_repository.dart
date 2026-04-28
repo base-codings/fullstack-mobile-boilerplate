@@ -11,8 +11,8 @@ class FakeHelloRepository implements HelloRepository {
   /// Response to return on success. Ignored if [error] is set.
   HelloMessage? response;
 
-  /// If set, [getHello] throws this object.
-  Object? error;
+  /// If set, [getHello] throws this exception.
+  Exception? error;
 
   /// Number of times [getHello] was invoked. Used to assert retries.
   int callCount = 0;
@@ -24,7 +24,7 @@ class FakeHelloRepository implements HelloRepository {
     return response ??
         HelloMessage(
           message: 'fake message',
-          timestamp: DateTime.utc(2026, 4, 26, 12, 0, 0),
+          timestamp: DateTime.utc(2026, 4, 26, 12),
         );
   }
 }

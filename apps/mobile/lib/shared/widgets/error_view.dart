@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show AsyncError;
 
 /// Full-viewport error display with an optional retry action.
 ///

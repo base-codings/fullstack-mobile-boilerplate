@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 /// Domain entity representing a greeting message from the backend.
 ///
 /// Kept as a plain Dart class so the initial scaffold compiles without
@@ -7,7 +9,8 @@
 ///   1. Add `part 'hello_message.freezed.dart';` and `part 'hello_message.g.dart';`
 ///   2. Add `@freezed` annotation and `with _$HelloMessage` mixin.
 ///   3. Run `dart run build_runner build --delete-conflicting-outputs`.
-///   See docs/guides/add-new-flutter-feature.md for the full pattern.
+///   See docs/guides/flutter-feature.md for the full pattern.
+@immutable
 class HelloMessage {
   const HelloMessage({
     required this.message,
@@ -18,8 +21,7 @@ class HelloMessage {
   final DateTime timestamp;
 
   @override
-  String toString() =>
-      'HelloMessage(message: $message, timestamp: $timestamp)';
+  String toString() => 'HelloMessage(message: $message, timestamp: $timestamp)';
 
   @override
   bool operator ==(Object other) =>

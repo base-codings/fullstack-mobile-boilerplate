@@ -23,3 +23,14 @@ linter:
   rules:
     always_use_package_imports: true
     avoid_relative_lib_imports: true
+    # --- Relaxed for boilerplate scaffold (see docs/code-standards.md) ---
+    # Boilerplate code is intentionally minimal; field names are self-
+    # documenting. Adopters add docs to their own business APIs as needed.
+    public_member_api_docs: false
+    # 80 chars too tight for modern Flutter method chains. Project uses 100
+    # (configure `dart format --line-length=100` for matching auto-format).
+    lines_longer_than_80_chars: false
+    # Clean Architecture pattern: HelloRepository is intentionally an abstract
+    # class (single method today, easily extended). Don't suggest replacing
+    # with a typedef/Function type.
+    one_member_abstracts: false
