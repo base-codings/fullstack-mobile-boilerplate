@@ -21,4 +21,16 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Add models below. See docs/guides/add-prisma-module.md.
+// Add models below. See docs/guides/prisma-module.md.
+
+// =====================================================================
+// PLACEHOLDER MODEL — DELETE THIS WHEN ADDING YOUR FIRST REAL MODEL.
+// Prisma requires at least one model to generate @prisma/client. Without
+// the generated client, PrismaService can't bootstrap (super() crashes)
+// even when SKIP_DB=true (which only short-circuits $connect, not the
+// constructor). This stub satisfies the requirement until adopters
+// define real models.
+// =====================================================================
+model BoilerplatePlaceholder {
+  id String @id @default(cuid())
+}

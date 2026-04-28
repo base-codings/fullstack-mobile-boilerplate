@@ -14,14 +14,14 @@
   "packageManager": "pnpm@9.12.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "prepare": "lefthook install || true",
-    "install:melos": "command -v melos >/dev/null || (command -v fvm >/dev/null && fvm dart pub global activate melos) || dart pub global activate melos",
+    "prepare": "lefthook install || exit 0",
+    "install:melos": "command -v fvm >/dev/null && fvm dart pub global activate melos 6.3.3 || dart pub global activate melos 6.3.3",
     "bootstrap": "pnpm install",
     "bootstrap:full": "pnpm install && pnpm install:melos && pnpm codegen:api && melos bootstrap",
     "lint": "pnpm -r --if-present lint && melos run analyze",
     "test": "pnpm -r --if-present test && melos run test",
     "format": "pnpm -r --if-present format && melos run format",
-    "codegen:api": "bash tools/codegen/generate-api-client.sh",
+    "codegen:api": "node tools/codegen/generate-api-client.cjs",
     "test:cov": "pnpm --filter @mobile-boilerplate/api test:cov && (cd apps/mobile && fvm flutter test --coverage)"
   },
   "devDependencies": {

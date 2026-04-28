@@ -1,0 +1,26 @@
+# Force LF for shell scripts (must run on bash regardless of OS)
+*.sh           text eol=lf
+*.bash         text eol=lf
+
+# Force LF for files executed by Unix tooling
+tools/**       text eol=lf
+
+# Force LF for YAML configs that are parsed/run via bash on Windows
+# (lefthook spawns bash; CRLF inside multi-line `run: |` blocks breaks
+# shell parsing with "syntax error: unexpected end of file")
+*.yml          text eol=lf
+*.yaml         text eol=lf
+
+# Default: let git auto-detect text vs binary; use platform-native EOL
+*              text=auto
+
+# Lock binary file types
+*.png          binary
+*.jpg          binary
+*.jpeg         binary
+*.gif          binary
+*.ico          binary
+*.pdf          binary
+*.zip          binary
+*.jar          binary
+*.keystore     binary

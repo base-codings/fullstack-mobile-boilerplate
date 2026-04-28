@@ -1,5 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import type { Request } from 'express';
@@ -12,10 +11,8 @@ import { safeQueryString } from '../utils/safe-url';
  */
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  constructor(
-    @InjectPinoLogger(LoggingInterceptor.name)
-    private readonly logger: PinoLogger,
-  ) {}
+  // Output is routed through nestjs-pino via app.useLogger() in main.ts.
+  private readonly logger = new Logger(LoggingInterceptor.name);
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<Request & { id?: string }>();
@@ -33,28 +30,14 @@ export class LoggingInterceptor implements NestInterceptor {
         next: () => {
           const duration = Date.now() - start;
           this.logger.debug(
-            {
-              requestId,
-              method,
-              url,
-              handler: `${className}.${handlerName}`,
-              durationMs: duration,
-            },
-            'Request handled',
+            `Request handled ${method} ${url} ${className}.${handlerName} ${duration}ms requestId=${requestId}`,
           );
         },
         error: (err: unknown) => {
           const duration = Date.now() - start;
+          const errMsg = err instanceof Error ? err.message : String(err);
           this.logger.warn(
-            {
-              requestId,
-              method,
-              url,
-              handler: `${className}.${handlerName}`,
-              durationMs: duration,
-              err,
-            },
-            'Request failed',
+            `Request failed ${method} ${url} ${className}.${handlerName} ${duration}ms requestId=${requestId} err=${errMsg}`,
           );
         },
       }),

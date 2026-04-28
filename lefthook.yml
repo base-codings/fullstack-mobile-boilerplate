@@ -25,29 +25,29 @@ pre-commit:
       run: pnpm exec prettier --write {staged_files}
       stage_fixed: true
 
+    # Logic delegated to bash scripts because lefthook's Windows shell wrapper
+    # (printed as "not:" in errors) doesn't reliably parse inline if/elif/fi.
+    # Same pattern as lint-mobile-env. Scripts have explicit shebangs.
     analyze-mobile:
       root: "apps/mobile/"
       glob: "apps/mobile/**/*.dart"
-      run: |
-        if command -v fvm >/dev/null; then
-          fvm dart analyze --fatal-infos {staged_files}
-        elif command -v dart >/dev/null; then
-          dart analyze --fatal-infos {staged_files}
-        else
-          echo "::warning::dart/fvm not installed — skipping (CI will catch)"
-        fi
+      # Filter out generated files — dart analyze ignores analysis_options
+      # exclude patterns when given explicit file args.
+      exclude:
+        - "apps/mobile/**/*.g.dart"
+        - "apps/mobile/**/*.freezed.dart"
+        - "apps/mobile/lib/l10n/app_localizations*.dart"
+      # `root` makes cwd = apps/mobile, so script path is relative to that.
+      run: bash ../../tools/scripts/dart-analyze-staged.sh {staged_files}
 
     format-mobile:
       root: "apps/mobile/"
       glob: "apps/mobile/**/*.dart"
-      run: |
-        if command -v fvm >/dev/null; then
-          fvm dart format {staged_files}
-        elif command -v dart >/dev/null; then
-          dart format {staged_files}
-        else
-          echo "::warning::dart/fvm not installed — skipping format"
-        fi
+      exclude:
+        - "apps/mobile/**/*.g.dart"
+        - "apps/mobile/**/*.freezed.dart"
+        - "apps/mobile/lib/l10n/app_localizations*.dart"
+      run: bash ../../tools/scripts/dart-format-staged.sh {staged_files}
       stage_fixed: true
 
     lint-mobile-env:
@@ -60,12 +60,4 @@ pre-push:
       run: pnpm --filter @mobile-boilerplate/api test -- --passWithNoTests
 
     test-mobile:
-      run: |
-        cd apps/mobile
-        if command -v fvm >/dev/null; then
-          fvm flutter test
-        elif command -v flutter >/dev/null; then
-          flutter test
-        else
-          echo "::warning::flutter not installed — skipping (CI will catch)"
-        fi
+      run: bash tools/scripts/flutter-test.sh

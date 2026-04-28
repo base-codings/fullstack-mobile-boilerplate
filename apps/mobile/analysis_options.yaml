@@ -9,6 +9,9 @@ analyzer:
     - '**/*.g.dart'
     - '**/*.freezed.dart'
     - 'lib/l10n/generated/**'
+    # Flutter `flutter gen-l10n` outputs to lib/l10n/ (not lib/l10n/generated/)
+    # by default. Exclude generated AppLocalizations sources from lint.
+    - 'lib/l10n/app_localizations*.dart'
 
 linter:
   rules:

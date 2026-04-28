@@ -20,7 +20,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "postinstall": "prisma generate || true"
+    "codegen:export": "ts-node --project tsconfig.json scripts/export-openapi.ts",
+    "postinstall": "prisma generate || exit 0"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.0",

@@ -6,9 +6,9 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { PinoLogger, InjectPinoLogger } from 'nestjs-pino';
 import type { Request } from 'express';
 
 interface ErrorResponseBody {
@@ -29,11 +29,12 @@ interface ErrorResponseBody {
 @Injectable()
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  constructor(
-    private readonly httpAdapterHost: HttpAdapterHost,
-    @InjectPinoLogger(AllExceptionsFilter.name)
-    private readonly logger: PinoLogger,
-  ) {}
+  // Output is routed through nestjs-pino because main.ts calls
+  // app.useLogger(app.get(Logger from 'nestjs-pino')). No PinoLogger named-token
+  // injection needed (nestjs-pino v4 doesn't auto-register PinoLogger:Context).
+  private readonly logger = new Logger(AllExceptionsFilter.name);
+
+  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
@@ -73,13 +74,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = 'An unexpected error occurred';
 
       // Log full error internally — never expose to client
-      this.logger.error({ err: exception, requestId }, 'Unhandled exception');
+      this.logger.error(`Unhandled exception requestId=${requestId}`, exception.stack);
     } else {
       statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
       errorCode = 'INTERNAL_SERVER_ERROR';
       message = 'An unexpected error occurred';
 
-      this.logger.error({ exception, requestId }, 'Unknown exception type');
+      this.logger.error(`Unknown exception type requestId=${requestId}`, String(exception));
     }
 
     const responseBody: ErrorResponseBody = {

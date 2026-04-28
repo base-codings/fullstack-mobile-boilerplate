@@ -1,0 +1,21 @@
+# Workspace root pubspec.yaml — exists ONLY to satisfy Melos 3.x+ local-install
+# requirement (Melos no longer runs from a global activation alone).
+#
+# Why minimal:
+#   - This is NOT a Dart package; it's the monorepo root.
+#   - publish_to: none prevents accidental publish.
+#   - The actual Dart/Flutter packages live in apps/mobile/ and packages/api_client/
+#     and have their own pubspec.yaml files.
+#   - Melos workspace config remains in melos.yaml (legacy layout, Melos 6.x compatible).
+#
+# Pinned to Melos 6.x because v7+ deprecates melos.yaml in favor of pub workspaces
+# (Dart 3.6+). We defer that migration — see plans/reports/ for the brainstorm.
+
+name: mobile_boilerplate_workspace
+publish_to: none
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dev_dependencies:
+  melos: ^6.3.3
