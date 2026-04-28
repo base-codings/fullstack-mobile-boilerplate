@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile_boilerplate/core/di/providers.dart';
@@ -9,7 +11,8 @@ import '../../helpers/pump_app.dart';
 
 void main() {
   group('HelloScreen', () {
-    testWidgets('renders the message returned by the repository', (tester) async {
+    testWidgets('renders the message returned by the repository',
+        (tester) async {
       final fake = FakeHelloRepository(
         response: HelloMessage(
           message: 'Hello from NestJS',
@@ -52,6 +55,8 @@ void main() {
 
     testWidgets('shows progress indicator while loading', (tester) async {
       // Repository never resolves — stays in loading.
+      // Use Completer (not Future.delayed) so no Timer is scheduled —
+      // pumpAndSettle would otherwise hang waiting for the timer.
       final fake = _NeverResolvingRepository();
 
       await pumpApp(
@@ -60,7 +65,11 @@ void main() {
         overrides: [helloRepositoryProvider.overrideWithValue(fake)],
       );
 
-      // Single pump (not pumpAndSettle) to capture the loading frame.
+      // Two pumps: first loads localization delegates, second settles the
+      // initial AsyncLoading frame. Don't use pumpAndSettle — the never-
+      // resolving Future means there's nothing more to settle, and we
+      // specifically want to capture the loading state.
+      await tester.pump();
       await tester.pump();
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
@@ -69,5 +78,5 @@ void main() {
 
 class _NeverResolvingRepository extends FakeHelloRepository {
   @override
-  Future<HelloMessage> getHello() => Future.delayed(const Duration(seconds: 30));
+  Future<HelloMessage> getHello() => Completer<HelloMessage>().future;
 }

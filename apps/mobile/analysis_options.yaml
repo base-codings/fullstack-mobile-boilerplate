@@ -3,8 +3,12 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   errors:
     avoid_relative_lib_imports: error
-  plugins:
-    - custom_lint
+  # custom_lint plugin disabled: analyzer_plugin 0.12.0 (transitive dep of
+  # custom_lint 0.7.x) uses legacy Element API; analyzer 7.6 (Dart 3.10+)
+  # removed it in favour of Element2 → AOT compile fails. Re-enable when
+  # custom_lint releases a version compatible with analyzer 7.x.
+  # plugins:
+  #   - custom_lint
   exclude:
     - '**/*.g.dart'
     - '**/*.freezed.dart'

@@ -1,0 +1,29 @@
+// Recommended extensions for this monorepo.
+//
+// VSCode will prompt adopters to install these on first open via the
+// "Recommended" notification.
+//
+// ⚠️ IMPORTANT — Prisma extension version pin
+// -------------------------------------------
+// This project pins Prisma ORM to v5.22.x (see apps/api/package.json).
+// The latest Prisma VSCode extension has pre-adopted Prisma 7 schema syntax
+// (`prisma.config.ts`, no `url` in datasource) and flags valid Prisma 5
+// schemas as errors.
+//
+// → After install, MANUALLY pin the extension to v5.x:
+//      Extensions panel → Prisma → ▾ next to Uninstall →
+//      "Install Another Version..." → choose 5.22.0 (or latest 5.x).
+//
+// VSCode does not support project-level version pinning natively, so adopters
+// must do this once per machine. When the project upgrades to Prisma 7
+// (currently deferred — see docs/code-standards.md), unpin and use latest.
+{
+  "recommendations": [
+    "Prisma.prisma",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "dart-code.dart-code",
+    "dart-code.flutter"
+  ],
+  "unwantedRecommendations": []
+}

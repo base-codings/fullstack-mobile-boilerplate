@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_boilerplate/features/hello/presentation/controllers/hello_controller.dart';
 import 'package:mobile_boilerplate/features/hello/presentation/widgets/hello_card.dart';
+import 'package:mobile_boilerplate/l10n/app_localizations.dart';
 import 'package:mobile_boilerplate/shared/widgets/error_view.dart';
 import 'package:mobile_boilerplate/shared/widgets/loading_view.dart';
 
@@ -13,6 +13,7 @@ import 'package:mobile_boilerplate/shared/widgets/loading_view.dart';
 ///   AsyncError   → [ErrorView] with retry button
 ///   AsyncData    → [HelloCard] with message + timestamp
 class HelloScreen extends ConsumerWidget {
+  /// Const constructor — HelloScreen is mounted as the root route.
   const HelloScreen({super.key});
 
   @override
@@ -31,8 +32,7 @@ class HelloScreen extends ConsumerWidget {
           error: (error, _) => ErrorView(
             message: error.toString(),
             retryLabel: l10n.helloErrorRetry,
-            onRetry: () =>
-                ref.read(helloControllerProvider.notifier).refresh(),
+            onRetry: () => ref.read(helloControllerProvider.notifier).refresh(),
           ),
           data: (message) => ListView(
             children: [

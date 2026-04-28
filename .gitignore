@@ -59,7 +59,6 @@ tools/codegen/dist/
 
 # IDE / OS
 .idea/
-.vscode/
 *.iml
 *.swp
 *.swo
