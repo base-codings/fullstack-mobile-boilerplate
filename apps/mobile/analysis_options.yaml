@@ -3,10 +3,12 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   errors:
     avoid_relative_lib_imports: error
-  # custom_lint plugin disabled: analyzer_plugin 0.12.0 (transitive dep of
-  # custom_lint 0.7.x) uses legacy Element API; analyzer 7.6 (Dart 3.10+)
-  # removed it in favour of Element2 → AOT compile fails. Re-enable when
-  # custom_lint releases a version compatible with analyzer 7.x.
+  # custom_lint plugin disabled — packages also removed from pubspec.yaml.
+  # Reason: analyzer_plugin 0.12.0 (transitive dep) uses the legacy Element
+  # API which analyzer 7.x (Dart 3.6+) replaced with Element2. AOT compile
+  # fails for both `dart analyze` (plugin load) and `dart run build_runner
+  # build` (entrypoint precompile). Re-enable + re-add deps when both
+  # custom_lint and riverpod_lint publish releases compatible with analyzer 7.x.
   # plugins:
   #   - custom_lint
   exclude:

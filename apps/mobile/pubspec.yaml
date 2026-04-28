@@ -12,7 +12,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^2.5.1
-  riverpod_annotation: ^2.3.5
+  # riverpod_annotation removed — scaffold uses plain Provider/AsyncNotifierProvider.
+  # Re-add when migrating to @riverpod codegen (also re-add riverpod_generator
+  # in dev_dependencies). See lib/core/di/providers.dart for migration notes.
   dio: ^5.7.0
   go_router: ^14.6.0
   flutter_dotenv: ^5.2.1
@@ -25,12 +27,16 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  riverpod_generator: ^2.4.0
+  # riverpod_generator + custom_lint + riverpod_lint removed:
+  # all three transitively pull analyzer_plugin 0.12.0, which uses the
+  # legacy Element API and fails to precompile against analyzer 7.x
+  # (Dart 3.6+) — breaks `dart run build_runner build` on Linux CI.
+  # The scaffold doesn't use @riverpod codegen yet (controllers use plain
+  # AsyncNotifierProvider), so these are dead weight today.
+  # Re-add all three when each publishes a release compatible with analyzer 7.x.
   build_runner: ^2.4.13
   freezed: ^2.5.7
   json_serializable: ^6.8.0
-  custom_lint: ^0.7.3
-  riverpod_lint: ^2.6.0
   very_good_analysis: ^6.0.0
   mocktail: ^1.0.4
 
