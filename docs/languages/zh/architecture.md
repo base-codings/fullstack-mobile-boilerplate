@@ -262,7 +262,7 @@ Consumer(builder: (ctx, ref, child) {
 
 3. **Swagger 规范生成：**
    - NestJS @nestjs/swagger 读取装饰器
-   - 规范自动生成于 `http://localhost:3000/api-json`（开发模式）
+   - 规范自动生成于 `http://localhost:3000/api-docs/json`（开发模式）
    - 保存为 `openapi.json`（CI/CD）
 
 4. **Dart 客户端生成：**

@@ -399,7 +399,7 @@ curl -X GET http://localhost:3000/users/1 \
 
 **Check Swagger:**
 ```
-http://localhost:3000/api (development mode)
+http://localhost:3000/api-docs (development mode)
 ```
 
 ## Step 12: Add Real Authentication (Later)

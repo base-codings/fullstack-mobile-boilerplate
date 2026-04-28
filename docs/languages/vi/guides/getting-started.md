@@ -119,7 +119,7 @@ curl http://localhost:3000/hello
 # {"data":{"message":"Hello World","timestamp":"..."},"meta":{...},"error":null}
 ```
 
-**Swagger:** http://localhost:3000/api (development mode only)
+**Swagger:** http://localhost:3000/api-docs (chỉ development; non-dev đặt `ENABLE_SWAGGER=true`)
 
 ## Mobile Setup
 
@@ -271,8 +271,8 @@ fvm flutter run --flavor=dev       # Run
 # Regenerate API client
 pnpm codegen:api
 
-# View Swagger UI
-# http://localhost:3000/api (dev only)
+# Xem Swagger UI (OpenAPI JSON tại /api-docs/json)
+# http://localhost:3000/api-docs (chỉ dev; ENABLE_SWAGGER=true cho non-dev)
 
 # Stop all
 docker-compose down              # Stop Postgres

@@ -399,7 +399,7 @@ curl -X GET http://localhost:3000/users/1 \
 
 **检查 Swagger：**
 ```
-http://localhost:3000/api（开发模式）
+http://localhost:3000/api-docs（开发模式）
 ```
 
 ## 步骤 12：添加真实认证（稍后）

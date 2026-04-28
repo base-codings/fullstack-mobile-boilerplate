@@ -54,17 +54,26 @@ async getPost(@Param('id') id: string) {
 
 ### 3. 生成 OpenAPI 规范
 
-NestJS 应用在 `/api-json`（开发模式）生成 Swagger 规范：
+NestJS 应用在 `isSwaggerEnabled` 为 true 时暴露 Swagger（`development` 总是开启；
+其他环境需设 `ENABLE_SWAGGER=true`）。挂载路径包含 API 前缀
+（默认 `api`，见 `API_PREFIX`）：
+
+| 资源             | URL                                          |
+| ---------------- | -------------------------------------------- |
+| Swagger UI       | `http://localhost:3000/api-docs`             |
+| OpenAPI JSON     | `http://localhost:3000/api-docs/json`        |
 
 ```bash
 # 启动后端
 pnpm --filter @mobile-boilerplate/api dev
 
-# 规范可在以下访问
-curl http://localhost:3000/api-json > openapi.json
+# 获取规范（codegen 管道使用）
+curl http://localhost:3000/api-docs/json > openapi.json
 ```
 
-或 Swagger UI 在 `http://localhost:3000/api`。
+> **注意：** codegen 管道（`pnpm codegen:api`）**不**需要服务器运行 —
+> 它通过 `apps/api/scripts/export-openapi.ts` 以 stub 模式（`SKIP_DB=true`）
+> 启动 NestJS 并直接导出规范。上述 URL 仅用于手动检查/调试。
 
 ### 4. 重新生成 Dart 客户端
 

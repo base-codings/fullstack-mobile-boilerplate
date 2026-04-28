@@ -119,7 +119,7 @@ curl http://localhost:3000/hello
 # {"data":{"message":"Hello World","timestamp":"..."},"meta":{...},"error":null}
 ```
 
-**Swagger:** http://localhost:3000/api（仅开发模式）
+**Swagger:** http://localhost:3000/api-docs（仅开发模式；非开发环境需设 `ENABLE_SWAGGER=true`）
 
 ## 移动设置
 
@@ -263,8 +263,8 @@ fvm flutter run --flavor=dev       # 运行
 # 重新生成 API 客户端
 pnpm codegen:api
 
-# 查看 Swagger UI
-# http://localhost:3000/api（仅开发模式）
+# 查看 Swagger UI（OpenAPI JSON 在 /api-docs/json）
+# http://localhost:3000/api-docs（仅开发模式；非开发设 ENABLE_SWAGGER=true）
 
 # 停止全部
 docker-compose down              # 停止 Postgres

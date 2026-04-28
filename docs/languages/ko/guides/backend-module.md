@@ -399,7 +399,7 @@ curl -X GET http://localhost:3000/users/1 \
 
 **Swagger 확인:**
 ```
-http://localhost:3000/api (개발 모드)
+http://localhost:3000/api-docs (개발 모드)
 ```
 
 ## Step 12: 실제 인증 추가 (나중에)

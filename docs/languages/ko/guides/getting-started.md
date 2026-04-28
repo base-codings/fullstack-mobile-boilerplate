@@ -119,7 +119,7 @@ curl http://localhost:3000/hello
 # {"data":{"message":"Hello World","timestamp":"..."},"meta":{...},"error":null}
 ```
 
-**Swagger:** http://localhost:3000/api (개발 모드만)
+**Swagger:** http://localhost:3000/api-docs (개발 모드만; 다른 env는 `ENABLE_SWAGGER=true` 설정)
 
 ## 모바일 설정
 
@@ -241,7 +241,7 @@ fvm flutter run --verbose  # 전체 오류 확인
 
 **오류: "Invalid response envelope" 또는 "type mismatch"**
 - API 클라이언트 오래됨: `pnpm codegen:api`
-- http://localhost:3000/api에서 Swagger 확인
+- http://localhost:3000/api-docs에서 Swagger 확인
 - Controller에서 `@ApiStandardResponse(Dto)` 검증
 
 ## 일반 커맨드
@@ -272,8 +272,8 @@ fvm flutter run --flavor=dev       # 실행
 # API 클라이언트 재생성
 pnpm codegen:api
 
-# Swagger UI 보기
-# http://localhost:3000/api (dev only)
+# Swagger UI 보기 (OpenAPI JSON: /api-docs/json)
+# http://localhost:3000/api-docs (dev only; non-dev은 ENABLE_SWAGGER=true)
 
 # 모두 중지
 docker-compose down              # Postgres 중지

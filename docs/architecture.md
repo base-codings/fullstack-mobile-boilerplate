@@ -262,7 +262,7 @@ Consumer(builder: (ctx, ref, child) {
 
 3. **Swagger Spec Generation:**
    - NestJS @nestjs/swagger reads decorators
-   - Spec auto-generated at `http://localhost:3000/api-json` (dev)
+   - Spec auto-generated at `http://localhost:3000/api-docs/json` (dev)
    - Saved to `openapi.json` (CI/CD)
 
 4. **Dart Client Generation:**

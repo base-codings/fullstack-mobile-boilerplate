@@ -262,7 +262,7 @@ Consumer(builder: (ctx, ref, child) {
 
 3. **Swagger 스펙 생성:**
    - NestJS @nestjs/swagger는 데코레이터 읽음
-   - 스펙은 `http://localhost:3000/api-json` (dev)에서 자동 생성
+   - 스펙은 `http://localhost:3000/api-docs/json` (dev)에서 자동 생성
    - `openapi.json`에 저장 (CI/CD)
 
 4. **Dart 클라이언트 생성:**

@@ -134,7 +134,7 @@ curl http://localhost:3000/hello
 # {"data":{"message":"Hello World","timestamp":"..."},"meta":{...},"error":null}
 ```
 
-**Swagger:** http://localhost:3000/api (development mode only)
+**Swagger:** http://localhost:3000/api-docs (development mode only; set `ENABLE_SWAGGER=true` for non-dev)
 
 ## Mobile Setup
 
@@ -255,7 +255,7 @@ fvm flutter run --verbose  # See full error
 
 **Error: "Invalid response envelope" or "type mismatch"**
 - API client may be stale: `pnpm codegen:api`
-- Check Swagger at http://localhost:3000/api
+- Check Swagger at http://localhost:3000/api-docs
 - Verify `@ApiStandardResponse(Dto)` on controller
 
 ## Common Commands
@@ -286,8 +286,8 @@ fvm flutter run --flavor=dev       # Run
 # Regenerate API client
 pnpm codegen:api
 
-# View Swagger UI
-# http://localhost:3000/api (dev only)
+# View Swagger UI (also OpenAPI JSON at /api-docs/json)
+# http://localhost:3000/api-docs (dev only; ENABLE_SWAGGER=true for non-dev)
 
 # Stop all
 docker-compose down              # Stop Postgres

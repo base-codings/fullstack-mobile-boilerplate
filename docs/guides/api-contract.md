@@ -54,17 +54,27 @@ async getPost(@Param('id') id: string) {
 
 ### 3. Generate OpenAPI Spec
 
-The NestJS app generates Swagger spec at `/api-json` (dev mode):
+The NestJS app exposes Swagger when `isSwaggerEnabled` is true (always in
+`development`; in other envs set `ENABLE_SWAGGER=true`). The mount paths
+include the API prefix (`api` by default, see `API_PREFIX`):
+
+| Resource         | URL                                          |
+| ---------------- | -------------------------------------------- |
+| Swagger UI       | `http://localhost:3000/api-docs`             |
+| OpenAPI JSON     | `http://localhost:3000/api-docs/json`        |
 
 ```bash
 # Start backend
 pnpm --filter @mobile-boilerplate/api dev
 
-# Spec accessible at
-curl http://localhost:3000/api-json > openapi.json
+# Fetch the spec (used by the Dart codegen pipeline)
+curl http://localhost:3000/api-docs/json > openapi.json
 ```
 
-Or Swagger UI at `http://localhost:3000/api`.
+> **Note:** the codegen pipeline (`pnpm codegen:api`) does NOT need a running
+> server — it boots NestJS in stub mode (`SKIP_DB=true`) via
+> `apps/api/scripts/export-openapi.ts` and dumps the spec directly. The URLs
+> above are for manual inspection / debugging.
 
 ### 4. Regenerate Dart Client
 

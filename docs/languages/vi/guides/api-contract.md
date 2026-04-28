@@ -52,19 +52,29 @@ async getPost(@Param('id') id: string) {
 - `operationId` → clean Dart method name (`getPost()` not `postsControllerGetPostUsingGet()`)
 - `@ApiStandardResponse` → wraps DTO in envelope shape `{ data, meta, requestId }`
 
-### 3. Generate OpenAPI Spec
+### 3. Sinh OpenAPI Spec
 
-The NestJS app generates Swagger spec at `/api-json` (dev mode):
+NestJS app expose Swagger khi `isSwaggerEnabled` true (luôn bật trong
+`development`; ở env khác cần `ENABLE_SWAGGER=true`). Mount path bao gồm
+API prefix (`api` mặc định, xem `API_PREFIX`):
+
+| Resource         | URL                                          |
+| ---------------- | -------------------------------------------- |
+| Swagger UI       | `http://localhost:3000/api-docs`             |
+| OpenAPI JSON     | `http://localhost:3000/api-docs/json`        |
 
 ```bash
-# Start backend
+# Khởi động backend
 pnpm --filter @mobile-boilerplate/api dev
 
-# Spec accessible at
-curl http://localhost:3000/api-json > openapi.json
+# Lấy spec (codegen pipeline dùng)
+curl http://localhost:3000/api-docs/json > openapi.json
 ```
 
-Or Swagger UI at `http://localhost:3000/api`.
+> **Note:** codegen pipeline (`pnpm codegen:api`) KHÔNG cần server đang chạy
+> — boot NestJS ở stub mode (`SKIP_DB=true`) qua
+> `apps/api/scripts/export-openapi.ts` và dump spec trực tiếp. URL bên trên
+> chỉ để inspect/debug thủ công.
 
 ### 4. Regenerate Dart Client
 

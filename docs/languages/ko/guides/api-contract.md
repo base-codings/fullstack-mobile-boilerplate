@@ -54,17 +54,26 @@ async getPost(@Param('id') id: string) {
 
 ### 3. OpenAPI 스펙 생성
 
-NestJS 앱은 dev 모드에서 `/api-json`에 Swagger 스펙 생성:
+NestJS 앱은 `isSwaggerEnabled`가 true일 때 Swagger 노출(`development`에서는
+항상 활성; 다른 env에서는 `ENABLE_SWAGGER=true` 설정 필요). 마운트 경로는
+API 프리픽스 포함(기본 `api`, `API_PREFIX` 참조):
+
+| Resource         | URL                                          |
+| ---------------- | -------------------------------------------- |
+| Swagger UI       | `http://localhost:3000/api-docs`             |
+| OpenAPI JSON     | `http://localhost:3000/api-docs/json`        |
 
 ```bash
 # 백엔드 시작
 pnpm --filter @mobile-boilerplate/api dev
 
-# 스펙 접근
-curl http://localhost:3000/api-json > openapi.json
+# 스펙 가져오기 (codegen 파이프라인이 사용)
+curl http://localhost:3000/api-docs/json > openapi.json
 ```
 
-또는 `http://localhost:3000/api`에서 Swagger UI.
+> **참고:** codegen 파이프라인(`pnpm codegen:api`)은 서버 실행 **불필요** —
+> `apps/api/scripts/export-openapi.ts`를 통해 stub 모드(`SKIP_DB=true`)로
+> NestJS를 부팅하고 스펙을 직접 덤프함. 위 URL은 수동 점검/디버그용.
 
 ### 4. Dart 클라이언트 재생성
 
